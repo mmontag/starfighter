@@ -8,23 +8,29 @@
 
 /* Begin PBXBuildFile section */
 		2E3A8BD31DB9733C00D0943C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E3A8BD21DB9733C00D0943C /* main.cpp */; };
+		7CB95BD01DCBA98500797D66 /* libtmx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CB95BCF1DCBA98500797D66 /* libtmx.a */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		2E3A8BCD1DB9733C00D0943C /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		2E3A8BCF1DB9733C00D0943C /* Starfighter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Starfighter; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E3A8BD21DB9733C00D0943C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		2E5FE8BB1DC68DEA00A4FC47 /* AssetCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AssetCache.h; sourceTree = "<group>"; };
+		2E67BBDB1DC831A1005AE866 /* Text.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Text.h; sourceTree = "<group>"; };
+		2EA153851DCAA0FB00DAE299 /* Missile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Missile.h; sourceTree = "<group>"; };
+		2EADD9BC1DBAFA64002B6BCD /* Player.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Player.h; sourceTree = "<group>"; };
+		2EADD9BD1DBAFC89002B6BCD /* Texture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Texture.h; sourceTree = "<group>"; };
+		2EADD9BE1DBB1204002B6BCD /* Timer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
+		2EADD9BF1DBB1677002B6BCD /* Bullet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bullet.h; sourceTree = "<group>"; };
+		2EADD9C21DBDA78C002B6BCD /* Asteroid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Asteroid.h; sourceTree = "<group>"; };
+		2ECDD8F71DCD918E0048AD7E /* GameObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
+		7C7302A91DC6B472008B8BFF /* Animation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Animation.h; sourceTree = "<group>"; };
+		7C7302AC1DC6BC38008B8BFF /* Point.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Point.h; sourceTree = "<group>"; };
+		7C7302B51DC704A2008B8BFF /* Starfield.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Starfield.h; sourceTree = "<group>"; };
+		7C7302B81DC86DE7008B8BFF /* HUD.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HUD.h; sourceTree = "<group>"; };
+		7CB7EA481DCDBD6700296AB8 /* Game.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
+		7CB95BCF1DCBA98500797D66 /* libtmx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libtmx.a; sourceTree = "<group>"; };
+		7CB95BD11DCBAA1800797D66 /* tmx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tmx.h; sourceTree = "<group>"; };
+		7CB95BD81DCC75F000797D66 /* Map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Map.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7CB95BD01DCBA98500797D66 /* libtmx.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -43,6 +50,7 @@
 			children = (
 				2E3A8BD11DB9733C00D0943C /* Starfighter */,
 				2E3A8BD01DB9733C00D0943C /* Products */,
+				2E3A8BD91DB973C000D0943C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -57,9 +65,41 @@
 		2E3A8BD11DB9733C00D0943C /* Starfighter */ = {
 			isa = PBXGroup;
 			children = (
+				7CB95BD71DCC759800797D66 /* libs */,
+				7CB95BD11DCBAA1800797D66 /* tmx.h */,
 				2E3A8BD21DB9733C00D0943C /* main.cpp */,
+				2EADD9BC1DBAFA64002B6BCD /* Player.h */,
+				2EADD9BD1DBAFC89002B6BCD /* Texture.h */,
+				2EADD9BE1DBB1204002B6BCD /* Timer.h */,
+				2EADD9BF1DBB1677002B6BCD /* Bullet.h */,
+				2EADD9C21DBDA78C002B6BCD /* Asteroid.h */,
+				2E5FE8BB1DC68DEA00A4FC47 /* AssetCache.h */,
+				7C7302A91DC6B472008B8BFF /* Animation.h */,
+				7C7302AC1DC6BC38008B8BFF /* Point.h */,
+				7C7302B51DC704A2008B8BFF /* Starfield.h */,
+				2E67BBDB1DC831A1005AE866 /* Text.h */,
+				7C7302B81DC86DE7008B8BFF /* HUD.h */,
+				2EA153851DCAA0FB00DAE299 /* Missile.h */,
+				7CB95BD81DCC75F000797D66 /* Map.h */,
+				2ECDD8F71DCD918E0048AD7E /* GameObject.h */,
+				7CB7EA481DCDBD6700296AB8 /* Game.h */,
 			);
 			path = Starfighter;
+			sourceTree = "<group>";
+		};
+		2E3A8BD91DB973C000D0943C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7CB95BD71DCC759800797D66 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				7CB95BCF1DCBA98500797D66 /* libtmx.a */,
+			);
+			name = libs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -69,9 +109,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2E3A8BD61DB9733C00D0943C /* Build configuration list for PBXNativeTarget "Starfighter" */;
 			buildPhases = (
-				2E3A8BCB1DB9733C00D0943C /* Sources */,
 				2E3A8BCC1DB9733C00D0943C /* Frameworks */,
-				2E3A8BCD1DB9733C00D0943C /* CopyFiles */,
+				2E3A8BCB1DB9733C00D0943C /* Sources */,
+				7CB95BD21DCBAA7900797D66 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -88,7 +128,7 @@
 		2E3A8BC71DB9733C00D0943C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = "Patrick Montag";
 				TargetAttributes = {
 					2E3A8BCE1DB9733C00D0943C = {
@@ -113,6 +153,24 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		7CB95BD21DCBAA7900797D66 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp \"${PROJECT_DIR}/Sprites/\"* \"${TARGET_BUILD_DIR}\"\ncp \"${PROJECT_DIR}/Sounds/\"* \"${TARGET_BUILD_DIR}\"";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		2E3A8BCB1DB9733C00D0943C /* Sources */ = {
@@ -144,6 +202,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -191,6 +250,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -216,6 +276,27 @@
 		2E3A8BD71DB9733C00D0943C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+					"$(PROJECT_DIR)",
+				);
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					/usr/local/lib,
+					"$(PROJECT_DIR)/Starfighter",
+				);
+				OTHER_LDFLAGS = (
+					"-lSDL2",
+					"-lSDL2_mixer",
+					"-lSDL2_image",
+					"-liconv",
+					"-lxml2",
+					"-lz",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -223,6 +304,27 @@
 		2E3A8BD81DB9733C00D0943C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+					"$(PROJECT_DIR)",
+				);
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					/usr/local/lib,
+					"$(PROJECT_DIR)/Starfighter",
+				);
+				OTHER_LDFLAGS = (
+					"-lSDL2",
+					"-lSDL2_mixer",
+					"-lSDL2_image",
+					"-liconv",
+					"-lxml2",
+					"-lz",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -246,6 +348,7 @@
 				2E3A8BD81DB9733C00D0943C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
