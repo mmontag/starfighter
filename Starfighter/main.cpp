@@ -19,19 +19,7 @@
 #include <deque>
 #include <list>
 
-// headers
-#include "AssetCache.h"
-#include "Player.h"
-#include "Bullet.h"
-#include "Missile.h"
-#include "Asteroid.h"
-#include "Animation.h"
-#include "Point.h"
-#include "Starfield.h"
-#include "Text.h"
-#include "HUD.h"
-#include "Map.h"
-//#include "MusicPlayer.h"
+#include "Game.h"
 
 // logical resolution
 const int LOGICAL_WIDTH = 320;
@@ -47,17 +35,11 @@ const int SCREEN_HEIGHT = (gameBounds.h * SCREEN_SCALE_FACTOR);
 
 int FRAME_TIME = 0;
 
-uint asteroidCounter;
-int asteroidsDestroyed = 0;
-
 //Starts up SDL and creates window
 bool init();
 
 //Frees media and shuts down SDL
 void close();
-
-// box collision detector
-bool checkCollision(SDL_Rect a, SDL_Rect b);
 
 //The window we'll be rendering to
 SDL_Window* window = NULL;
@@ -65,49 +47,7 @@ SDL_Window* window = NULL;
 //The window renderer
 SDL_Renderer* renderer = NULL;
 
-char scoreBuf[100];
-
 using namespace std;
-
-/* Music_Player
-// TODO: organize music player lifted from Shay Green's sample code
-static Music_Player* player;
-static bool paused;
-
-void handle_error( const char* error )
-{
-    if ( error ) {
-        fprintf(stderr, "Error: %s", error);
-    }
-}
-
-static void start_track( int track, const char* path )
-{
-    paused = false;
-    handle_error( player->start_track( track - 1 ) );
-
-    // update window title with track info
-
-    long seconds = player->track_info().length / 1000;
-    const char* game = player->track_info().game;
-    if ( !*game )
-    {
-        // extract filename
-        game = strrchr( path, '\\' ); // DOS
-        if ( !game )
-            game = strrchr( path, '/' ); // UNIX
-        if ( !game )
-            game = path;
-        else
-            game++; // skip path separator
-    }
-
-    char title [512];
-    printf( title, "%s: %d/%d %s (%ld:%02ld)\n",
-            game, track, player->track_count(), player->track_info().song,
-            seconds / 60, seconds % 60 );
-}
-*/
 
 bool init() {
     //Initialization flag
@@ -132,10 +72,6 @@ bool init() {
                 break;
             }
         }
-        //if (controller == NULL) {
-        //    printf("open failed: %s\n", SDL_GetError());
-        //    return false;
-        //}
         
         // connect controller
         if (controller) {
@@ -156,7 +92,7 @@ bool init() {
         // print music decoders available
         int i,max=Mix_GetNumMusicDecoders();
         for(i=0; i<max; ++i)
-            printf("Music decoder %d is for %s", i, Mix_GetMusicDecoder(i));
+            printf("Music decoder %d: %s\n", i, Mix_GetMusicDecoder(i));
         Mix_Music *music;
         music = Mix_LoadMUS("lifefrce.mp3");
         if(!music) {
@@ -194,16 +130,6 @@ bool init() {
         }
     }
 
-// MusicPlayer NES junk - Requires SDL_OpenAudio (Not Mix_OpenAudio)
-//    player = new Music_Player;
-//    if ( !player )
-//        handle_error( "Out of memory" );
-//    handle_error( player->init() );
-//
-//    const char* path = "lifefrce.nsf";
-//    handle_error( player->load_file(path) );
-//    start_track( 1, path );
-
     return success;
 }
 
@@ -227,7 +153,8 @@ int main(int argc, char* args[]) {
     if(!init()) {
         printf("Failed to initialize!\n");
     } else {
-        
+        Game game(renderer, gameBounds);
+        game.run();
     }
     // free resources and close SDL
     close();

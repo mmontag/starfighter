@@ -23,6 +23,7 @@
 		2EADD9BF1DBB1677002B6BCD /* Bullet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bullet.h; sourceTree = "<group>"; };
 		2EADD9C21DBDA78C002B6BCD /* Asteroid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Asteroid.h; sourceTree = "<group>"; };
 		2ECDD8F71DCD918E0048AD7E /* GameObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
+		7C4E5E691DCF2D2D00F0A385 /* Enemy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Enemy.h; sourceTree = "<group>"; };
 		7C7302A91DC6B472008B8BFF /* Animation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Animation.h; sourceTree = "<group>"; };
 		7C7302AC1DC6BC38008B8BFF /* Point.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Point.h; sourceTree = "<group>"; };
 		7C7302B51DC704A2008B8BFF /* Starfield.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Starfield.h; sourceTree = "<group>"; };
@@ -66,23 +67,24 @@
 			isa = PBXGroup;
 			children = (
 				7CB95BD71DCC759800797D66 /* libs */,
-				7CB95BD11DCBAA1800797D66 /* tmx.h */,
-				2E3A8BD21DB9733C00D0943C /* main.cpp */,
-				2EADD9BC1DBAFA64002B6BCD /* Player.h */,
-				2EADD9BD1DBAFC89002B6BCD /* Texture.h */,
-				2EADD9BE1DBB1204002B6BCD /* Timer.h */,
-				2EADD9BF1DBB1677002B6BCD /* Bullet.h */,
 				2EADD9C21DBDA78C002B6BCD /* Asteroid.h */,
 				2E5FE8BB1DC68DEA00A4FC47 /* AssetCache.h */,
 				7C7302A91DC6B472008B8BFF /* Animation.h */,
+				2EADD9BF1DBB1677002B6BCD /* Bullet.h */,
+				7C4E5E691DCF2D2D00F0A385 /* Enemy.h */,
+				7CB7EA481DCDBD6700296AB8 /* Game.h */,
+				2ECDD8F71DCD918E0048AD7E /* GameObject.h */,
+				7C7302B81DC86DE7008B8BFF /* HUD.h */,
+				7CB95BD81DCC75F000797D66 /* Map.h */,
+				2EA153851DCAA0FB00DAE299 /* Missile.h */,
+				2EADD9BC1DBAFA64002B6BCD /* Player.h */,
 				7C7302AC1DC6BC38008B8BFF /* Point.h */,
 				7C7302B51DC704A2008B8BFF /* Starfield.h */,
 				2E67BBDB1DC831A1005AE866 /* Text.h */,
-				7C7302B81DC86DE7008B8BFF /* HUD.h */,
-				2EA153851DCAA0FB00DAE299 /* Missile.h */,
-				7CB95BD81DCC75F000797D66 /* Map.h */,
-				2ECDD8F71DCD918E0048AD7E /* GameObject.h */,
-				7CB7EA481DCDBD6700296AB8 /* Game.h */,
+				2EADD9BD1DBAFC89002B6BCD /* Texture.h */,
+				2EADD9BE1DBB1204002B6BCD /* Timer.h */,
+				2E3A8BD21DB9733C00D0943C /* main.cpp */,
+				7CB95BD11DCBAA1800797D66 /* tmx.h */,
 			);
 			path = Starfighter;
 			sourceTree = "<group>";

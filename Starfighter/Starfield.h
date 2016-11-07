@@ -39,6 +39,7 @@ struct Star {
 
 class Starfield {
 public:
+    Starfield() {}
     Starfield(SDL_Renderer* r, SDL_Rect gb) {
         texture = SDL_CreateTexture(r, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, gb.w, gb.h);
         gameBounds = gb;
@@ -78,7 +79,7 @@ private:
     SDL_Renderer* renderer;
     SDL_Texture* texture;
     SDL_Rect gameBounds;
-    const int count = 200;
+    int count = 200;
     vector<Star*> stars;
 };
 

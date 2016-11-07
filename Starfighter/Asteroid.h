@@ -20,13 +20,9 @@ public:
     void update();
     void render();
 
-    void damage();
-
     float scale = 1.0;
 
 private:
-    int health;
-
     static const int ASTEROID_WIDTH = 16;
     static const int ASTEROID_HEIGHT = 16;
     static const int ASTEROID_VEL = 2;
@@ -42,8 +38,8 @@ Asteroid::Asteroid(AssetCache* ac, const SDL_Rect& gb) : GameObject(ac, gb) {
     pos.x = rand() % gameBounds.w - 16;
     pos.y = -32;
     vel.x = 0;
-    vel.y = (rand() % 40)/10.0 + 1;
-    health = (rand() % 3) + 1;
+    vel.y = (rand() % 40)/100.0 + 1;
+    health = 5; //(rand() % 3) + 1;
     // Giant Asteroids just for fun
     // if (rand() % 100 == 0) {
     //    scale = 10;
@@ -53,11 +49,7 @@ Asteroid::Asteroid(AssetCache* ac, const SDL_Rect& gb) : GameObject(ac, gb) {
     collisionBox.y = pos.y;
     collisionBox.w = ASTEROID_WIDTH;
     collisionBox.h = ASTEROID_HEIGHT;
-}
-
-void Asteroid::damage() {
-    health--;
-    if (health <= 0) killed = true;
+    damageInflicted = 1;
 }
 
 void Asteroid::update() {
@@ -71,12 +63,11 @@ void Asteroid::update() {
 
     if (pos.y > gameBounds.h + asteroidClip.h)
         killed = true;
-    
-    if (health <= 0)
-        killed = true;
 }
 
 void Asteroid::render() {
+    if (killed)
+        return;
     if (health / scale >= 3)
         texture->render(pos.x, pos.y, &asteroidClip, scale);
     else if (health / scale >= 2)

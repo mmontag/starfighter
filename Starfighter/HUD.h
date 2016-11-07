@@ -17,6 +17,7 @@ const Point POWER_METER_POS(5, 10);
 
 class HUD {
 public:
+    HUD() {}
     HUD(Starfighter* sf, AssetCache* ac, SDL_Renderer* r, SDL_Rect gb) {
         starfighter = sf;
         assetCache = ac;

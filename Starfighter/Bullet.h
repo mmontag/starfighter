@@ -20,6 +20,14 @@ public:
         texture = assetCache->getTexture("laser.png");
         vel = Point(0, BULLET_VEL);
         collisionBox = { (int)pos.x, (int)pos.y, texture->getWidth(), texture->getHeight() };
+        damageInflicted = 1;
+    }
+
+    Bullet(Point pos, Point vel, AssetCache* ac, SDL_Rect &gb, char const* filename) : GameObject(pos, ac, gb) {
+        this->vel = vel;
+        texture = assetCache->getTexture(filename);
+        collisionBox = { (int)pos.x, (int)pos.y, texture->getWidth(), texture->getHeight() };
+        damageInflicted = 1;
     }
 
     void update() {
@@ -28,7 +36,10 @@ public:
         collisionBox.x = pos.x;
         collisionBox.y = pos.y;
 
-        if (pos.y < 0 - texture->getHeight())
+        if (pos.y < 0 - texture->getHeight() ||
+            pos.y > gameBounds.h ||
+            pos.x < 0 - texture->getWidth() ||
+            pos.x > gameBounds.w)
             killed = true;
     }
 };

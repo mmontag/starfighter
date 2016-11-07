@@ -18,73 +18,77 @@
 
 using namespace std;
 
+static const int STARFIGHTER_WIDTH = 16;
+static const int STARFIGHTER_HEIGHT = 16;
+static const int FIRE_RATE = 10;
+static const int STARFIGHTER_VEL = 2;
+static const float BASE_COOLDOWN_RATE = 0.1;
+static const int EXPLODING_FRAMES = 100;
+
 // starfighter class
 class Starfighter
 {
 public:
-    // dimensions of the hero for collision purposes
-    static const int STARFIGHTER_WIDTH = 16;
-    static const int STARFIGHTER_HEIGHT = 16;
-    static const int FIRE_RATE = 10; // bullets per second, fire rate 2 bps 500
+    Starfighter() {}
+    Starfighter(AssetCache* ac, list<game_obj_ptr>* projectiles, SDL_Rect gameBounds);
     
-    // maximum axis velocity of the hero
-    static const int STARFIGHTER_VEL = 2;
-    
-    // initializes the variables
-    Starfighter(AssetCache* ac, list<game_obj_ptr> &projectiles, SDL_Rect gameBounds);
-    
-    // takes key presses and adjusts the hero's velocity
     void handleEvent( SDL_Event& e );
-    
-    //Moves the Starfighter
     void update();
-    
-    // shows the hero on the screen
     void render();
 
-    void damage() {
-        shield->reset();
-        health--;
+    void damage(float amount) {
+        if (explodingCountdown > 0) return;
 
+        health -= amount;
         if (health <= 0) {
-            SDL_Event event;
-            event.type = deathEvent;
-            SDL_PushEvent(&event);
-            health = 5;
+            health = 0;
+            destroy();
+        } else {
+            shield->reset();
         }
     }
 
-    // x and y offsets of the Starfighter
-    float posX, posY;
+    void destroy() {
+        if (explodingCountdown > 0) return;
+
+        Mix_PlayChannel(-1, assetCache->getSound("big-explosion.wav"), 0);
+        explodingCountdown = EXPLODING_FRAMES;
+    }
+
+    void resetPosition() {
+        pos.x = gameBounds.w / 2 - starfighterClip.w / 2;
+        pos.y = gameBounds.h - 20 - starfighterClip.h;
+    }
+
+    Point getCenter() {
+        return Point(pos.x + collisionBox.w / 2, pos.y + collisionBox.h / 2);
+    }
+
+    Point pos;
+    Point vel;
     
-    // velocity of the Starfighter
-    float velX, velY;
-    
-    // fire laser weapon function
     void fireWeapon();
     void fireMissile();
     
-    // is firing? is spacebar held down?
     bool isFiringLaser;
-    bool canFire;
     bool isCoolingDown;
+    bool isExploding;
     
     float laserEnergy;
     float maxLaserEnergy;
     float laserCooldownRate;
-    
-    // health of Starfighter
     float health;
-    
-    // collision box
+
     SDL_Rect collisionBox;
 
     static Uint32 deathEvent;
 
+    int explodingCountdown = 0;
     int lastBulletTick = 0;
     uint bulletCounter;
     
 private:
+    Texture* texture;
     AssetCache* assetCache;
     list<game_obj_ptr>* projectiles;
     
@@ -96,151 +100,128 @@ private:
     SDL_Rect gameBounds;
     
     Animation* shield;
-    
-    int frameCounter = 0;
 
-    // the acceleration of the Starfighter falling, or flying.
-    float accX = 0;
-    float accY = 0;
+    int frameCounter = 0;
 };
 
 Uint32 Starfighter::deathEvent = SDL_RegisterEvents(1);
 
-Starfighter::Starfighter(AssetCache* ac, list<game_obj_ptr>& projectiles, SDL_Rect gb) : projectiles(&projectiles) {
+Starfighter::Starfighter(AssetCache* ac, list<game_obj_ptr>* projectiles, SDL_Rect gb) : projectiles(projectiles) {// : GameObject(ac, gb)   {
     
     assetCache = ac;
     gameBounds = gb;
-    
     collisionBox = { 0, 0, 16, 16 };
     starfighterClip = { 0, 0, 16, 16 };
     starfighterLeftClip = { 16, 0, 16, 16 };
     starfighterRightClip = { 32, 0, 16, 16 };
-    
-    // TODO: convert to Point
-    posX = gameBounds.w / 2 - starfighterClip.w / 2;
-    posY = gameBounds.h / 2 - starfighterClip.h / 2;
-    
-    // jets = new Animation(posX, posY, 8, "jets.png", assetCache, false, 16);
-    shield = new Animation(Point(posX + 8, posY + 8), 24, "shield_animation.png", assetCache);
-    
-    velX = 0;
-    velY = 0;
+    resetPosition();
 
-    canFire = true;
+    texture = assetCache->getTexture("starfighter.png");
+    shield = new Animation(Point(pos.x + 8, pos.y + 8), 24, "shield_animation.png", assetCache);
+
     isCoolingDown = false;
     isFiringLaser = false;
     
     laserEnergy = 0;
     maxLaserEnergy = 5;
-    laserCooldownRate = .1; // fractions of energy per frame
+    laserCooldownRate = BASE_COOLDOWN_RATE; // fractions of energy per frame
     health = 5;
+    //damageInflicted = 1;
 }
 
 void Starfighter::handleEvent(SDL_Event& e) {
-    // if a key was pressed
-    if(e.type == SDL_KEYDOWN && e.key.repeat == 0) {
-        // adjust the velocity
+    if (e.type == SDL_KEYUP && e.key.repeat == 0) {
         switch(e.key.keysym.sym) {
-            case SDLK_UP: velY -= STARFIGHTER_VEL;
-                break;
-            case SDLK_DOWN: velY += STARFIGHTER_VEL;
-                break;
-            case SDLK_LEFT: velX -= STARFIGHTER_VEL;
-                break;
-            case SDLK_RIGHT: velX += STARFIGHTER_VEL;
-                break;
-            case SDLK_SPACE:
-                isFiringLaser = true;
-                if (isCoolingDown) {
-                    Mix_PlayChannel(-1, assetCache->getSound("overload.wav"), 0);
-                }
-                break;
-            case SDLK_a: fireMissile();
-                printf ("Missile fired");
-                break;
-        }
-    }
-
-    // if a key was released
-    else if(e.type == SDL_KEYUP && e.key.repeat == 0) {
-        // adjust the velocity
-        switch(e.key.keysym.sym) {
-            case SDLK_UP: velY += STARFIGHTER_VEL;
-                break;
-            case SDLK_DOWN: velY -= STARFIGHTER_VEL;
-                break;
-            case SDLK_LEFT: velX += STARFIGHTER_VEL;
-                break;
-            case SDLK_RIGHT: velX -= STARFIGHTER_VEL;
-                break;
-            case SDLK_SPACE:
-                isFiringLaser = false;
-                break;
+            case SDLK_UP:    vel.y += STARFIGHTER_VEL; break;
+            case SDLK_DOWN:  vel.y -= STARFIGHTER_VEL; break;
+            case SDLK_LEFT:  vel.x += STARFIGHTER_VEL; break;
+            case SDLK_RIGHT: vel.x -= STARFIGHTER_VEL; break;
+            case SDLK_SPACE: isFiringLaser = false; break;
             case SDLK_a:
                 break;
         }
     }
-    
-    // handle controller input
-    if(e.type == SDL_CONTROLLERBUTTONDOWN) {
+
+    if (e.type == SDL_CONTROLLERBUTTONUP) {
         switch(e.cbutton.button) {
-            case SDL_CONTROLLER_BUTTON_DPAD_UP: velY -= STARFIGHTER_VEL;
-                break;
-            case SDL_CONTROLLER_BUTTON_DPAD_DOWN: velY += STARFIGHTER_VEL;
-                break;
-            case SDL_CONTROLLER_BUTTON_DPAD_LEFT: velX -= STARFIGHTER_VEL;
-                break;
-            case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: velX += STARFIGHTER_VEL;
-                break;
-            case SDL_CONTROLLER_BUTTON_A:
+            case SDL_CONTROLLER_BUTTON_DPAD_UP:     vel.y += STARFIGHTER_VEL; break;
+            case SDL_CONTROLLER_BUTTON_DPAD_DOWN:   vel.y -= STARFIGHTER_VEL; break;
+            case SDL_CONTROLLER_BUTTON_DPAD_LEFT:   vel.x += STARFIGHTER_VEL; break;
+            case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:  vel.x -= STARFIGHTER_VEL; break;
+            case SDL_CONTROLLER_BUTTON_A:           isFiringLaser = false; break;
+        }
+    }
+
+    if (e.type == SDL_KEYDOWN && e.key.repeat == 0) {
+        switch(e.key.keysym.sym) {
+            case SDLK_UP:    vel.y -= STARFIGHTER_VEL; break;
+            case SDLK_DOWN:  vel.y += STARFIGHTER_VEL; break;
+            case SDLK_LEFT:  vel.x -= STARFIGHTER_VEL; break;
+            case SDLK_RIGHT: vel.x += STARFIGHTER_VEL; break;
+            case SDLK_SPACE:
                 isFiringLaser = true;
                 if (isCoolingDown) {
                     Mix_PlayChannel(-1, assetCache->getSound("overload.wav"), 0);
                 }
                 break;
+            case SDLK_a: fireMissile(); break;
         }
     }
-    // button release
-    else if (e.type == SDL_CONTROLLERBUTTONUP) {
-        switch(e.cbutton.button) {
-            case SDL_CONTROLLER_BUTTON_DPAD_UP: velY += STARFIGHTER_VEL;
-                break;
-            case SDL_CONTROLLER_BUTTON_DPAD_DOWN: velY -= STARFIGHTER_VEL;
-                break;
-            case SDL_CONTROLLER_BUTTON_DPAD_LEFT: velX += STARFIGHTER_VEL;
-                break;
-            case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: velX -= STARFIGHTER_VEL;
-                break;
+
+    if (e.type == SDL_CONTROLLERBUTTONDOWN) {
+        switch (e.cbutton.button) {
+            case SDL_CONTROLLER_BUTTON_DPAD_UP:     vel.y -= STARFIGHTER_VEL; break;
+            case SDL_CONTROLLER_BUTTON_DPAD_DOWN:   vel.y += STARFIGHTER_VEL; break;
+            case SDL_CONTROLLER_BUTTON_DPAD_LEFT:   vel.x -= STARFIGHTER_VEL; break;
+            case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:  vel.x += STARFIGHTER_VEL; break;
             case SDL_CONTROLLER_BUTTON_A:
-                isFiringLaser = false;
+                isFiringLaser = true;
+                if (isCoolingDown) {
+                    Mix_PlayChannel(-1, assetCache->getSound("overload.wav"), 0);
+                }
                 break;
         }
     }
 }
 
 void Starfighter::update() {
+    if (explodingCountdown == 1) {
+        SDL_Event event;
+        event.type = deathEvent;
+        SDL_PushEvent(&event);
+        resetPosition();
+
+        health = 5;
+    }
+    if (explodingCountdown > 0) {
+        if (explodingCountdown % 10 == 0) {
+            Point p = { pos.x + rand() % collisionBox.w, pos.y + rand() % collisionBox.h };
+            projectiles->push_back(game_obj_ptr(new Animation(p, 12, "small_explosion.png", assetCache)));
+        }
+        explodingCountdown--;
+        return;
+    }
+
+
     // change position on screen according to velocity and acceleration
-    posX += velX;
-    posY += velY;
-    
-    velX += accX;
-    velY += accY;
-    
+    pos.x += vel.x;
+    pos.y += vel.y;
+
     // If the hero went too far to the left or right
-    if((posX < 0) || (posX + STARFIGHTER_WIDTH > gameBounds.w)) {
+    if((pos.x < 0) || (pos.x + STARFIGHTER_WIDTH > gameBounds.w)) {
         //Move back
-        posX -= velX;
+        pos.x -= vel.x;
     }
     
     // if the hero went too far up or down
-    if((posY < 0) || (posY + STARFIGHTER_HEIGHT > gameBounds.h)) {
+    if((pos.y < 0) || (pos.y + STARFIGHTER_HEIGHT > gameBounds.h)) {
         //Move back
-        posY -= velY;
+        pos.y -= vel.y;
     }
     
     // change collider box too !
-    collisionBox.x = posX;
-    collisionBox.y = posY;
+    collisionBox.x = pos.x;
+    collisionBox.y = pos.y;
     
     if(isCoolingDown == false) {
         if(isFiringLaser && SDL_GetTicks() > lastBulletTick + (1000 / (FIRE_RATE)))
@@ -268,28 +249,29 @@ void Starfighter::update() {
 }
 
 void Starfighter::render() {
-    
-    Texture* texture = assetCache->getTexture("starfighter.png");
-    
-    if(velX > 0) {
-        texture->render(posX, posY, &starfighterRightClip);
-    } else if(velX < 0) {
-        texture->render(posX, posY, &starfighterLeftClip);
+    // Flash while exploding
+    if ((explodingCountdown / 10) % 2 == 1)
+        return;
+
+    if(vel.x > 0) {
+        texture->render(pos.x, pos.y, &starfighterRightClip);
+    } else if(vel.x < 0) {
+        texture->render(pos.x, pos.y, &starfighterLeftClip);
     } else {
-        texture->render(posX, posY, &starfighterClip);
+        texture->render(pos.x, pos.y, &starfighterClip);
     }
 
-    shield->render(Point(posX + 8, posY + 8));
+    shield->render(Point(pos.x + 8, pos.y + 8));
 }
 
 void Starfighter::fireWeapon() {
-    if (canFire == true && isCoolingDown == false) {
+    if (isCoolingDown == false) {
         Mix_PlayChannel(-1, assetCache->getSound("fire.wav"), 0);
     
         if (bulletCounter % 2 == 0) {
-            projectiles->push_back(game_obj_ptr(new Bullet(Point(posX + 0, posY + 6), assetCache, gameBounds)));
+            projectiles->push_back(game_obj_ptr(new Bullet(Point(pos.x + 0, pos.y + 6), assetCache, gameBounds)));
         } else {
-            projectiles->push_back(game_obj_ptr(new Bullet(Point(posX + 13, posY + 6), assetCache, gameBounds)));
+            projectiles->push_back(game_obj_ptr(new Bullet(Point(pos.x + 13, pos.y + 6), assetCache, gameBounds)));
         }
         laserEnergy++;
     }
@@ -298,7 +280,7 @@ void Starfighter::fireWeapon() {
 }
 
 void Starfighter::fireMissile() {
-    projectiles->push_back(game_obj_ptr(new Missile(Point(posX, posY), assetCache, gameBounds)));
+    projectiles->push_back(game_obj_ptr(new Missile(Point(pos.x + 8, pos.y - 4), assetCache, gameBounds)));
 }
 
 #endif /* Starfighter_h */
