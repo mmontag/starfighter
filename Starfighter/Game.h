@@ -23,9 +23,13 @@
 #include "Map.h"
 
 struct ScriptEvent {
-    list<EnemyBehavior> behaviors;
+    EnemyBehavior behavior;
     int time;
 };
+
+// Static member initializers for classes without .cpp files
+int Action::instanceCount;
+int GameObject::instanceCount;
 
 class Game {
 public:
@@ -33,11 +37,21 @@ public:
         renderer = r;
         gameBounds = gb;
         assetCache = new AssetCache(renderer);
-        gameObjectLists = { &projectiles, &destructibles, &explosions, &hostiles };
+        preloadAssets();
+
+        gameObjectLists = { &projectiles, &destructibles, &sprites, &hostiles };
         starfighter = Starfighter(assetCache, &projectiles, gameBounds);
         starfield = Starfield(renderer, gameBounds);
         hud = HUD(&starfighter, assetCache, renderer, gameBounds);
         gameMap = new Map(renderer, gameBounds, "test2.tmx");
+
+        GameObjectFactory::assetCache = assetCache;
+        GameObjectFactory::sprites = &sprites;
+        GameObjectFactory::hostiles = &hostiles;
+        GameObjectFactory::projectiles = &projectiles;
+        GameObjectFactory::destructibles = &destructibles;
+        GameObjectFactory::starfighter = &starfighter;
+        GameObjectFactory::gameBounds = gb;
     }
 
     SDL_Renderer* renderer;
@@ -48,7 +62,7 @@ public:
     uint asteroidCounter = 0;
     list<game_obj_ptr> projectiles;
     list<game_obj_ptr> destructibles;
-    list<game_obj_ptr> explosions;
+    list<game_obj_ptr> sprites;
     list<game_obj_ptr> hostiles;
     list<list<game_obj_ptr>*> gameObjectLists;
     Starfighter starfighter;
@@ -58,16 +72,18 @@ public:
     int gameStartTime;
     int points = 0;
     list<ScriptEvent> enemyScript = {
-        { {SWOOP_DOWN}, 1000 },
-        { {SWOOP_DOWN}, 2000 },
-        { {SWOOP_DOWN}, 3000 },
-        { {SWOOP_DOWN}, 4000 },
-
-        { {SWOOP_DOWN}, 9000 },
-        { {SWOOP_DOWN}, 10000 },
-        { {SWOOP_DOWN}, 11000 },
-        { {SWOOP_DOWN}, 12000 },
+        { ZIG_ZAG, 1000 },
+        { ZIG_ZAG, 2000 },
+        { ZIG_ZAG, 3000 },
+        { ZIG_ZAG, 4000 },
+        { ZIG_ZAG, 5000 },
+        { LEFT_TO_RIGHT, 6000 },
+        { SWOOP_DOWN, 9000 },
+        { SWOOP_DOWN, 10000 },
+        { SWOOP_DOWN, 11000 },
+        { SWOOP_DOWN, 12000 },
     };
+
     list<ScriptEvent>::iterator currentScriptEvent = enemyScript.begin();
 
     void run() {
@@ -77,15 +93,6 @@ public:
 
         // event handler
         SDL_Event e;
-
-        // TODO: move this assetCache preloading stuff to a separate method
-        assetCache->addSoundToGroup("explosions", "explosion1.wav");
-        assetCache->addSoundToGroup("explosions", "explosion2.wav");
-        assetCache->addSoundToGroup("explosions", "explosion3.wav");
-        assetCache->addSoundToGroup("explosions", "explosion2.wav");
-        assetCache->addSoundToGroup("explosions", "explosion3.wav");
-        assetCache->addSoundToGroup("explosions", "explosion2.wav");
-        assetCache->addSoundToGroup("explosions", "explosion3.wav");
 
         // object lists
         Text scoreText(Point(5, 5), assetCache, scoreTextBuf);
@@ -108,7 +115,7 @@ public:
                             reset();
                             break;
                         case SDLK_e:
-                            destructibles.push_back(game_obj_ptr(new Enemy(assetCache, gameBounds, &starfighter, &hostiles)));
+                            GameObjectFactory::create("enemy");
                     }
                 }
 
@@ -125,22 +132,22 @@ public:
             // Execute game script
             while (currentScriptEvent != enemyScript.end() &&
                    SDL_GetTicks() - gameStartTime > currentScriptEvent->time) {
-                destructibles.push_front(game_obj_ptr(new Enemy(assetCache, gameBounds, &starfighter, &hostiles,
-                                                                currentScriptEvent->behaviors)));
+                destructibles.push_front(game_obj_ptr(new Enemy(assetCache, gameBounds, &starfighter,
+                                                                currentScriptEvent->behavior)));
                 currentScriptEvent++;
             }
 
             starfighter.update();
 
-            checkCollisions(&destructibles, &projectiles, &explosions);
-            checkCollisions(&destructibles, starfighter, &explosions);
-            checkCollisions(&hostiles, starfighter, &explosions);
+            checkCollisions(&destructibles, &projectiles);
+            checkCollisions(&destructibles, starfighter);
+            checkCollisions(&hostiles, starfighter);
             if (gameMap->collision(starfighter.collisionBox)) {
                 starfighter.damage(1);
             }
 
             updateAllObjects(gameObjectLists);
-            generateAsteroids(destructibles);
+            //generateAsteroids(destructibles);
 
             // ------- REMOVE
 
@@ -154,13 +161,17 @@ public:
             gameMap->render();
 
             renderAllObjects(gameObjectLists);
-
             starfighter.render();
+
+            gameMap->renderAbove();
+
             sprintf(scoreTextBuf, "Score: %d", points);
             scoreText.render();
-            sprintf(debugTextBuf, "ast: %lu / proj: %lu / obj: %d",
-                    destructibles.size(), projectiles.size(), GameObject::instanceCount);
+
+            sprintf(debugTextBuf, "go: %d / d: %lu / p: %lu / t: %d / a: %d",
+                    GameObject::instanceCount, destructibles.size(), projectiles.size(), Texture::instanceCount, Action::instanceCount);
             debugText.render();
+
             hud.render();
 
             SDL_RenderPresent(renderer);
@@ -176,6 +187,18 @@ public:
         projectiles.clear();
         hostiles.clear();
         destructibles.clear();
+        sprites.clear();
+    }
+
+    void preloadAssets() {
+        // TODO: move this assetCache preloading stuff to a separate method
+        assetCache->addSoundToGroup("explosions", "explosion1.wav");
+        assetCache->addSoundToGroup("explosions", "explosion2.wav");
+        assetCache->addSoundToGroup("explosions", "explosion3.wav");
+        assetCache->addSoundToGroup("explosions", "explosion2.wav");
+        assetCache->addSoundToGroup("explosions", "explosion3.wav");
+        assetCache->addSoundToGroup("explosions", "explosion2.wav");
+        assetCache->addSoundToGroup("explosions", "explosion3.wav");
     }
 
     void generateAsteroids(list<game_obj_ptr> &asteroids) {
@@ -189,22 +212,19 @@ public:
     
     // check for projetiles against enemies / destructibles
     
-    void checkCollisions(list<game_obj_ptr>* destructibles, list<game_obj_ptr>* projectiles, list<game_obj_ptr>* explosions) {
+    void checkCollisions(list<game_obj_ptr>* destructibles, list<game_obj_ptr>* projectiles) {
         for (game_obj_ptr d : *destructibles) {
             for (game_obj_ptr p : *projectiles) {
                 if (d->killed || p->killed) continue;
                 if (checkCollision(d->collisionBox, p->collisionBox)) {
                     p->kill();
-                    printf("Enemy health: %f\n", d->health);
                     d->damage(p->damageInflicted);
-                    printf("Dmg: %f\n", p->damageInflicted);
-                    printf("Enemy health: %f\n", d->health);
                     if (d->killed) {
-                        explosions->push_back(game_obj_ptr(new Animation(d->getCenter(), 24, "med_explosion.png", assetCache)));
+                        sprites.push_back(game_obj_ptr(new Animation(d->getCenter(), 32, "enemy_explosion.png", assetCache)));
                         Mix_PlayChannel(-1, assetCache->getSound("explosion1.wav"), 0);
                         points++;
                     } else {
-                        explosions->push_back(game_obj_ptr(new Animation(p->getCenter(), 12, "small_explosion.png", assetCache)));
+                        sprites.push_back(game_obj_ptr(new Animation(p->getCenter(), 12, "small_explosion.png", assetCache)));
                         Mix_PlayChannel(-1, assetCache->getRandomSoundFromGroup("explosions"), 0);
                     }
                 }
@@ -212,14 +232,15 @@ public:
         }
     }
 
-    void checkCollisions(list<game_obj_ptr>* destructibles, Starfighter &starfighter, list<game_obj_ptr>* explosions) {
+    // check for starfighter flying into stuff
+    
+    void checkCollisions(list<game_obj_ptr>* destructibles, Starfighter &starfighter) {
         for (game_obj_ptr d : *destructibles) {
             if (d->killed) continue;
             if (checkCollision(d->collisionBox, starfighter.collisionBox)) {
-                Point center = d->getCenter();
-                d->damage(1); //(starfighter.damageInflicted);
+                d->damage(starfighter.damageInflicted);
                 starfighter.damage(d->damageInflicted);
-                explosions->push_back(game_obj_ptr(new Animation(center, 12, "small_explosion.png", assetCache)));
+                sprites.push_back(game_obj_ptr(new Animation(d->getCenter(), 12, "small_explosion.png", assetCache)));
                 Mix_PlayChannel(-1, assetCache->getRandomSoundFromGroup("explosions"), 0);
             }
         }

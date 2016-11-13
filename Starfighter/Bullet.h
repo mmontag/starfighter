@@ -14,15 +14,6 @@
 class Bullet : public GameObject
 {
 public:
-    const static int BULLET_VEL = -8;
-
-    Bullet(Point pos, AssetCache* ac, SDL_Rect &gb) : GameObject(pos, ac, gb) {
-        texture = assetCache->getTexture("laser.png");
-        vel = Point(0, BULLET_VEL);
-        collisionBox = { (int)pos.x, (int)pos.y, texture->getWidth(), texture->getHeight() };
-        damageInflicted = 1;
-    }
-
     Bullet(Point pos, Point vel, AssetCache* ac, SDL_Rect &gb, char const* filename) : GameObject(pos, ac, gb) {
         this->vel = vel;
         texture = assetCache->getTexture(filename);

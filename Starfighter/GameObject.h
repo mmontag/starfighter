@@ -9,31 +9,71 @@
 #ifndef GameObject_h
 #define GameObject_h
 
+#include <list>
+
 #include "Point.h"
 #include "Texture.h"
 #include "AssetCache.h"
+#include "Action.h"
+
+//struct ActionList;
 
 class GameObject;
-typedef std::shared_ptr<GameObject> game_obj_ptr;
+typedef shared_ptr<GameObject> game_obj_ptr;
 typedef void (*behaviorFnPtr)(game_obj_ptr);
+
+
+enum CollisionGroups {
+    ENEMY,
+    PLAYER,
+};
 
 class GameObject {
 public:
+    GameObject() {
+        instanceCount++;
+    }
     GameObject(Point pos, AssetCache* ac) : GameObject(pos, ac, SDL_Rect()) {}
     GameObject(AssetCache* ac, const SDL_Rect &gb) : GameObject(Point(), ac, gb) {}
     GameObject(Point pos, AssetCache* ac, const SDL_Rect &gb) : pos(pos), assetCache(ac), gameBounds(gb) {
         spawnTime = SDL_GetTicks();
+        actionList = action_ptr(new ActionList());
         instanceCount++;
     }
     ~GameObject() {
         instanceCount--;
     }
 
-    virtual void update() {};
+    virtual void update() {
+        actionList->update();
+
+        if (outOfBoundsKill) {
+            if (pos.y < 0 - texture->getHeight() ||
+                pos.y > gameBounds.h ||
+                pos.x < 0 - texture->getWidth() ||
+                pos.x > gameBounds.w) {
+                killed = true;
+                return;
+            }
+        }
+
+        collisionBox.x = pos.x;
+        collisionBox.y = pos.y;
+
+        for (auto child : children) {
+            child->update();
+        }
+    }
+
     virtual void render() {
         if (killed)
             return;
-        texture->render(pos);
+
+        texture->render(pos, &clipRect);
+
+        for (auto child : children) {
+            child->render();
+        }
     }
     virtual Point getCenter() {
         return Point(pos.x + collisionBox.w / 2, pos.y + collisionBox.h / 2);
@@ -50,6 +90,7 @@ public:
     }
     static int instanceCount;
     bool killed = false;
+    bool outOfBoundsKill = false;
     SDL_Rect collisionBox;
     
     float health;
@@ -58,14 +99,14 @@ public:
     int spawnTime;
     Point pos;
     Point vel;
-protected:
     AssetCache* assetCache;
+    list<game_obj_ptr> children;
+protected:
     SDL_Rect gameBounds;
+    SDL_Rect clipRect = {0,0,0,0};
     Texture* texture;
     list<behaviorFnPtr> behaviors;
-
+    action_ptr actionList;
 };
-
-int GameObject::instanceCount;
 
 #endif /* GameObject_h */

@@ -11,8 +11,9 @@
 
 #include <map>
 #include <string>
-#include  <random>
-#include  <iterator>
+#include <random>
+#include <iterator>
+#include <SDL2/SDL_mixer.h>
 
 #include "Texture.h"
 using namespace std;

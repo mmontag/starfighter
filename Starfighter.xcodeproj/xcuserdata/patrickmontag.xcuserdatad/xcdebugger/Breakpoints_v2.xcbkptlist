@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Starfighter/main.cpp"
-            timestampString = "500015793.480655"
+            timestampString = "500356504.36573"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "338"
-            endingLineNumber = "338">
+            startingLineNumber = "339"
+            endingLineNumber = "339">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

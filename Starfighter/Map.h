@@ -171,6 +171,17 @@ public:
 //            SDL_RenderCopy(ren, map_bmp, &bottomSrc, &bottomDest);
 //        }
         for (auto mapLayer : mapLayers) {
+            if (mapLayer.parallaxSpeed > 1)
+                continue;
+            SDL_Rect src = { 0, int(position * mapLayer.parallaxSpeed), gameBounds.w, gameBounds.h };
+            SDL_RenderCopy(ren, mapLayer.texture, &src, NULL);
+        }
+    }
+
+    void renderAbove() {
+        for (auto mapLayer : mapLayers) {
+            if (mapLayer.parallaxSpeed <= 1)
+                continue;
             SDL_Rect src = { 0, int(position * mapLayer.parallaxSpeed), gameBounds.w, gameBounds.h };
             SDL_RenderCopy(ren, mapLayer.texture, &src, NULL);
         }

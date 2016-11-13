@@ -15,11 +15,12 @@
 
 using namespace std;
 
-static const int DEFAULT_FRAME_DIVIDER = 4;
+const int DEFAULT_FRAME_DIVIDER = 2;
 
 class Animation : public GameObject {
 public:
     // Animates a horizontal sprite sheet, tiled in increments of widthStep
+    Animation() {}
     Animation(Point pos, int widthStep, string filename, AssetCache* ac, bool os = true, int fd = DEFAULT_FRAME_DIVIDER) : GameObject(pos, ac) {
         texture = assetCache->getTexture(filename);
         clip.x = 0;

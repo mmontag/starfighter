@@ -8,10 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		2E3A8BD31DB9733C00D0943C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E3A8BD21DB9733C00D0943C /* main.cpp */; };
+		7CA2CA041DD43FBB00D195F4 /* Action.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CA2CA031DD43FBB00D195F4 /* Action.cpp */; };
+		7CA2CA071DD484E700D195F4 /* GameObjectFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CA2CA061DD484E700D195F4 /* GameObjectFactory.cpp */; };
+		7CB6DD241DD1D2CD00E16A94 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CB6DD231DD1D2CD00E16A94 /* Player.cpp */; };
+		7CB6DD271DD1DC3600E16A94 /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CB6DD261DD1DC3600E16A94 /* Texture.cpp */; };
 		7CB95BD01DCBA98500797D66 /* libtmx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CB95BCF1DCBA98500797D66 /* libtmx.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2E1FD2FE1DD1AA86006BF8BB /* ExplodeAction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExplodeAction.h; sourceTree = "<group>"; };
+		2E1FD2FF1DD2E4A8006BF8BB /* GameObjectFactory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameObjectFactory.h; sourceTree = "<group>"; };
 		2E3A8BCF1DB9733C00D0943C /* Starfighter */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Starfighter; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E3A8BD21DB9733C00D0943C /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		2E5FE8BB1DC68DEA00A4FC47 /* AssetCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AssetCache.h; sourceTree = "<group>"; };
@@ -23,11 +29,17 @@
 		2EADD9BF1DBB1677002B6BCD /* Bullet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bullet.h; sourceTree = "<group>"; };
 		2EADD9C21DBDA78C002B6BCD /* Asteroid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Asteroid.h; sourceTree = "<group>"; };
 		2ECDD8F71DCD918E0048AD7E /* GameObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
+		2ED6F34B1DD1A37000DB6773 /* Action.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Action.h; sourceTree = "<group>"; };
 		7C4E5E691DCF2D2D00F0A385 /* Enemy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Enemy.h; sourceTree = "<group>"; };
 		7C7302A91DC6B472008B8BFF /* Animation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Animation.h; sourceTree = "<group>"; };
 		7C7302AC1DC6BC38008B8BFF /* Point.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Point.h; sourceTree = "<group>"; };
 		7C7302B51DC704A2008B8BFF /* Starfield.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Starfield.h; sourceTree = "<group>"; };
 		7C7302B81DC86DE7008B8BFF /* HUD.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HUD.h; sourceTree = "<group>"; };
+		7CA2CA031DD43FBB00D195F4 /* Action.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Action.cpp; sourceTree = "<group>"; };
+		7CA2CA061DD484E700D195F4 /* GameObjectFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameObjectFactory.cpp; sourceTree = "<group>"; };
+		7CB6DD231DD1D2CD00E16A94 /* Player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Player.cpp; sourceTree = "<group>"; };
+		7CB6DD251DD1DACD00E16A94 /* PlayerDeathAction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerDeathAction.h; sourceTree = "<group>"; };
+		7CB6DD261DD1DC3600E16A94 /* Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Texture.cpp; sourceTree = "<group>"; };
 		7CB7EA481DCDBD6700296AB8 /* Game.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Game.h; sourceTree = "<group>"; };
 		7CB95BCF1DCBA98500797D66 /* libtmx.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libtmx.a; sourceTree = "<group>"; };
 		7CB95BD11DCBAA1800797D66 /* tmx.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tmx.h; sourceTree = "<group>"; };
@@ -66,7 +78,9 @@
 		2E3A8BD11DB9733C00D0943C /* Starfighter */ = {
 			isa = PBXGroup;
 			children = (
+				7CA2CA081DD5681400D195F4 /* tmx */,
 				7CB95BD71DCC759800797D66 /* libs */,
+				7CA2CA051DD481B900D195F4 /* actions */,
 				2EADD9C21DBDA78C002B6BCD /* Asteroid.h */,
 				2E5FE8BB1DC68DEA00A4FC47 /* AssetCache.h */,
 				7C7302A91DC6B472008B8BFF /* Animation.h */,
@@ -74,17 +88,20 @@
 				7C4E5E691DCF2D2D00F0A385 /* Enemy.h */,
 				7CB7EA481DCDBD6700296AB8 /* Game.h */,
 				2ECDD8F71DCD918E0048AD7E /* GameObject.h */,
+				2E1FD2FF1DD2E4A8006BF8BB /* GameObjectFactory.h */,
+				7CA2CA061DD484E700D195F4 /* GameObjectFactory.cpp */,
 				7C7302B81DC86DE7008B8BFF /* HUD.h */,
 				7CB95BD81DCC75F000797D66 /* Map.h */,
 				2EA153851DCAA0FB00DAE299 /* Missile.h */,
 				2EADD9BC1DBAFA64002B6BCD /* Player.h */,
+				7CB6DD231DD1D2CD00E16A94 /* Player.cpp */,
 				7C7302AC1DC6BC38008B8BFF /* Point.h */,
 				7C7302B51DC704A2008B8BFF /* Starfield.h */,
 				2E67BBDB1DC831A1005AE866 /* Text.h */,
 				2EADD9BD1DBAFC89002B6BCD /* Texture.h */,
+				7CB6DD261DD1DC3600E16A94 /* Texture.cpp */,
 				2EADD9BE1DBB1204002B6BCD /* Timer.h */,
 				2E3A8BD21DB9733C00D0943C /* main.cpp */,
-				7CB95BD11DCBAA1800797D66 /* tmx.h */,
 			);
 			path = Starfighter;
 			sourceTree = "<group>";
@@ -94,6 +111,25 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7CA2CA051DD481B900D195F4 /* actions */ = {
+			isa = PBXGroup;
+			children = (
+				2ED6F34B1DD1A37000DB6773 /* Action.h */,
+				7CA2CA031DD43FBB00D195F4 /* Action.cpp */,
+				2E1FD2FE1DD1AA86006BF8BB /* ExplodeAction.h */,
+				7CB6DD251DD1DACD00E16A94 /* PlayerDeathAction.h */,
+			);
+			name = actions;
+			sourceTree = "<group>";
+		};
+		7CA2CA081DD5681400D195F4 /* tmx */ = {
+			isa = PBXGroup;
+			children = (
+				7CB95BD11DCBAA1800797D66 /* tmx.h */,
+			);
+			name = tmx;
 			sourceTree = "<group>";
 		};
 		7CB95BD71DCC759800797D66 /* libs */ = {
@@ -179,7 +215,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7CB6DD271DD1DC3600E16A94 /* Texture.cpp in Sources */,
+				7CA2CA041DD43FBB00D195F4 /* Action.cpp in Sources */,
+				7CB6DD241DD1D2CD00E16A94 /* Player.cpp in Sources */,
 				2E3A8BD31DB9733C00D0943C /* main.cpp in Sources */,
+				7CA2CA071DD484E700D195F4 /* GameObjectFactory.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

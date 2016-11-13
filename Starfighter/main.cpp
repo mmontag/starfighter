@@ -6,12 +6,11 @@
 //  Copyright © 2016 Patrick Montag. All rights reserved.
 //
 
-#include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_gamecontroller.h> // game controller api
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
-#include <stdio.h>
+#include <iostream>
 #include <string>
 #include <time.h> // time
 #include <stdlib.h> // srand and rand
@@ -95,6 +94,7 @@ bool init() {
             printf("Music decoder %d: %s\n", i, Mix_GetMusicDecoder(i));
         Mix_Music *music;
         music = Mix_LoadMUS("lifefrce.mp3");
+        Mix_VolumeMusic(MIX_MAX_VOLUME/16);
         if(!music) {
             printf("Mix_LoadMUS error: %s\n", Mix_GetError());
         } else {
