@@ -40,8 +40,12 @@ struct Star {
 class Starfield {
 public:
     Starfield() {}
-    Starfield(SDL_Renderer* r, SDL_Rect gb) {
+    Starfield(RENDERER* r, SDL_Rect gb) {
+#ifdef USE_GPU
+        texture = GPU_CreateImage(gb.w, gb.h, GPU_FORMAT_RGB);
+#else
         texture = SDL_CreateTexture(r, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, gb.w, gb.h);
+#endif
         gameBounds = gb;
         renderer = r;
         for (int i = 0; i < count; i++) {
@@ -55,8 +59,11 @@ public:
     void render() {
 //        SDL_SetRenderTarget(renderer, texture);
 //        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 100);
+#ifdef USE_GPU
+        GPU_SetShapeBlendMode(GPU_BLEND_NORMAL);
+#else
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-
+#endif
         // -- This does a motion-trail effect:
         // static const SDL_Rect rect = { 0, 0, width, height };
         // SDL_RenderFillRect(renderer, &rect);
@@ -66,18 +73,22 @@ public:
         for (auto star : stars) {
             float speed = star->vel.y;
             SDL_Color* col = &star->col;
-            SDL_SetRenderDrawColor(renderer, col->r, col->g, col->b, col->a);
             star->pos.y += speed;
             if (star->pos.y > gameBounds.h) star->pos.y -= gameBounds.h;
+#ifdef USE_GPU
+            GPU_Line(renderer, star->pos.x, star->pos.y, star->pos.x, star->pos.y - speed, *col);
+#else
+            SDL_SetRenderDrawColor(renderer, col->r, col->g, col->b, col->a);
             SDL_RenderDrawLine(renderer, star->pos.x, star->pos.y, star->pos.x, star->pos.y - speed);
+#endif
         }
 //        SDL_SetRenderTarget(renderer, NULL);
 //        SDL_RenderCopy(renderer, texture, NULL, NULL);
     }
 
 private:
-    SDL_Renderer* renderer;
-    SDL_Texture* texture;
+    RENDERER* renderer;
+    TEXTURE* texture;
     SDL_Rect gameBounds;
     int count = 200;
     vector<Star*> stars;

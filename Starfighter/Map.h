@@ -11,26 +11,32 @@
 #ifndef Map_h
 #define Map_h
 
-#import "tmx.h"
-#import <map>
-#import <list>
+#include "tmx.h"
 
-SDL_Renderer* ren;
+#include <map>
+#include <list>
+
+RENDERER* ren;
+
 void* sdl_img_loader(const char *path) {
-    printf(">>> Loading map image resource %s...\n", path);
-    SDL_Texture* img = IMG_LoadTexture(ren, path);
+    printf("Loading map image resource %s...\n", path);
+    TEXTURE* img = LOADTEXTURE(ren, path);
     return img;
 }
 
 struct MapLayer {
+#ifdef USE_GPU
+    GPU_Image* texture;
+#else
     SDL_Texture* texture;
+#endif
     float parallaxSpeed;
 };
 
 class Map {
 public:
     Map() {}
-    Map(SDL_Renderer* renderer, SDL_Rect gb, char const* filename) {
+    Map(RENDERER* renderer, SDL_Rect gb, char const* filename) {
         ren = renderer;
         gameBounds = gb;
         tmx_img_load_func = (void* (*)(const char*))sdl_img_loader;
@@ -57,8 +63,9 @@ public:
     }
 
     ~Map() {
-        for (auto mapLayer : mapLayers)
-            SDL_DestroyTexture(mapLayer.texture);
+        for (auto mapLayer : mapLayers) {
+            FREETEXTURE(mapLayer.texture);
+        }
         //tmx_map_free(map);
     }
 
@@ -134,6 +141,7 @@ public:
                         };
 
                         // Scan the pixels in this tile for opacity
+                        // TODO: extend for partially transparent tiles, intersect with player sprite
                         for (int x = rect.x; x < rect.x + rect.w; x++) {
                             for (int y = rect.y; y < rect.y + rect.h; y++) {
                                 Uint32* pixel = (Uint32*)surface->pixels + y * surface->pitch + x * sizeof *pixel;
@@ -173,8 +181,13 @@ public:
         for (auto mapLayer : mapLayers) {
             if (mapLayer.parallaxSpeed > 1)
                 continue;
+#ifdef USE_GPU
+            GPU_Rect src = { 0, position * mapLayer.parallaxSpeed, (float)gameBounds.w, (float)gameBounds.h };
+            GPU_Blit(mapLayer.texture, &src, ren, 0, 0);
+#else
             SDL_Rect src = { 0, int(position * mapLayer.parallaxSpeed), gameBounds.w, gameBounds.h };
             SDL_RenderCopy(ren, mapLayer.texture, &src, NULL);
+#endif
         }
     }
 
@@ -182,8 +195,13 @@ public:
         for (auto mapLayer : mapLayers) {
             if (mapLayer.parallaxSpeed <= 1)
                 continue;
+#ifdef USE_GPU
+            GPU_Rect src = { 0, position * mapLayer.parallaxSpeed, (float)gameBounds.w, (float)gameBounds.h };
+            GPU_Blit(mapLayer.texture, &src, ren, 0, 0);
+#else
             SDL_Rect src = { 0, int(position * mapLayer.parallaxSpeed), gameBounds.w, gameBounds.h };
             SDL_RenderCopy(ren, mapLayer.texture, &src, NULL);
+#endif
         }
     }
 
@@ -214,8 +232,8 @@ void Map::draw_layer(tmx_map *map, tmx_layer *layer) {
     float op;
     tmx_tileset *ts;
     tmx_image *im;
-    SDL_Rect srcrect, dstrect;
-    SDL_Texture* tileset;
+    RECT srcrect, dstrect;
+    TEXTURE* tileset;
     op = layer->opacity;
     for (i=0; i<map->height; i++) {
         for (j=0; j<map->width; j++) {
@@ -231,12 +249,15 @@ void Map::draw_layer(tmx_map *map, tmx_layer *layer) {
                 dstrect.y = (int)i*ts->tile_height;
                 /* TODO Opacity and Flips */
                 if (im) {
-                    tileset = (SDL_Texture*)im->resource_image;
+                    tileset = (TEXTURE*)im->resource_image;
+                } else {
+                    tileset = (TEXTURE*)ts->image->resource_image;
                 }
-                else {
-                    tileset = (SDL_Texture*)ts->image->resource_image;
-                }
+#ifdef USE_GPU
+                GPU_BlitRect(tileset, &srcrect, ren, &dstrect);
+#else
                 SDL_RenderCopy(ren, tileset, &srcrect, &dstrect);
+#endif
             }
         }
     }
@@ -245,12 +266,9 @@ void Map::draw_layer(tmx_map *map, tmx_layer *layer) {
 
 void Map::draw_image_layer(tmx_image *img) {
     SDL_Rect dim;
-
     dim.x = dim.y = 0;
     SDL_QueryTexture((SDL_Texture*)img->resource_image, NULL, NULL, &(dim.w), &(dim.h));
-
     SDL_RenderCopy(ren, (SDL_Texture*)img->resource_image, NULL, &dim);
-    
 }
 
 list<MapLayer> Map::render_map(tmx_map *map) {

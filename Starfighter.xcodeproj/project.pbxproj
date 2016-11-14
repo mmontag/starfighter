@@ -10,6 +10,8 @@
 		2E3A8BD31DB9733C00D0943C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2E3A8BD21DB9733C00D0943C /* main.cpp */; };
 		7CA2CA041DD43FBB00D195F4 /* Action.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CA2CA031DD43FBB00D195F4 /* Action.cpp */; };
 		7CA2CA071DD484E700D195F4 /* GameObjectFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CA2CA061DD484E700D195F4 /* GameObjectFactory.cpp */; };
+		7CA2CA1F1DD92CE800D195F4 /* libSDL2_gpu.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CA2CA1E1DD92CE800D195F4 /* libSDL2_gpu.a */; };
+		7CA2CA2C1DD9386C00D195F4 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CA2CA2B1DD9386C00D195F4 /* OpenGL.framework */; };
 		7CB6DD241DD1D2CD00E16A94 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CB6DD231DD1D2CD00E16A94 /* Player.cpp */; };
 		7CB6DD271DD1DC3600E16A94 /* Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CB6DD261DD1DC3600E16A94 /* Texture.cpp */; };
 		7CB95BD01DCBA98500797D66 /* libtmx.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CB95BCF1DCBA98500797D66 /* libtmx.a */; };
@@ -37,6 +39,9 @@
 		7C7302B81DC86DE7008B8BFF /* HUD.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HUD.h; sourceTree = "<group>"; };
 		7CA2CA031DD43FBB00D195F4 /* Action.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Action.cpp; sourceTree = "<group>"; };
 		7CA2CA061DD484E700D195F4 /* GameObjectFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameObjectFactory.cpp; sourceTree = "<group>"; };
+		7CA2CA1E1DD92CE800D195F4 /* libSDL2_gpu.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSDL2_gpu.a; sourceTree = "<group>"; };
+		7CA2CA2A1DD92D2A00D195F4 /* SDL_gpu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SDL_gpu.h; sourceTree = "<group>"; };
+		7CA2CA2B1DD9386C00D195F4 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		7CB6DD231DD1D2CD00E16A94 /* Player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Player.cpp; sourceTree = "<group>"; };
 		7CB6DD251DD1DACD00E16A94 /* PlayerDeathAction.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerDeathAction.h; sourceTree = "<group>"; };
 		7CB6DD261DD1DC3600E16A94 /* Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Texture.cpp; sourceTree = "<group>"; };
@@ -51,7 +56,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7CA2CA2C1DD9386C00D195F4 /* OpenGL.framework in Frameworks */,
 				7CB95BD01DCBA98500797D66 /* libtmx.a in Frameworks */,
+				7CA2CA1F1DD92CE800D195F4 /* libSDL2_gpu.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,7 @@
 		2E3A8BD11DB9733C00D0943C /* Starfighter */ = {
 			isa = PBXGroup;
 			children = (
+				7CA2CA201DD92CF900D195F4 /* SDL2_gpu */,
 				7CA2CA081DD5681400D195F4 /* tmx */,
 				7CB95BD71DCC759800797D66 /* libs */,
 				7CA2CA051DD481B900D195F4 /* actions */,
@@ -109,6 +117,7 @@
 		2E3A8BD91DB973C000D0943C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7CA2CA2B1DD9386C00D195F4 /* OpenGL.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -132,9 +141,18 @@
 			name = tmx;
 			sourceTree = "<group>";
 		};
+		7CA2CA201DD92CF900D195F4 /* SDL2_gpu */ = {
+			isa = PBXGroup;
+			children = (
+				7CA2CA2A1DD92D2A00D195F4 /* SDL_gpu.h */,
+			);
+			name = SDL2_gpu;
+			sourceTree = "<group>";
+		};
 		7CB95BD71DCC759800797D66 /* libs */ = {
 			isa = PBXGroup;
 			children = (
+				7CA2CA1E1DD92CE800D195F4 /* libSDL2_gpu.a */,
 				7CB95BCF1DCBA98500797D66 /* libtmx.a */,
 			);
 			name = libs;
@@ -215,10 +233,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2E3A8BD31DB9733C00D0943C /* main.cpp in Sources */,
 				7CB6DD271DD1DC3600E16A94 /* Texture.cpp in Sources */,
 				7CA2CA041DD43FBB00D195F4 /* Action.cpp in Sources */,
 				7CB6DD241DD1D2CD00E16A94 /* Player.cpp in Sources */,
-				2E3A8BD31DB9733C00D0943C /* main.cpp in Sources */,
 				7CA2CA071DD484E700D195F4 /* GameObjectFactory.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -261,6 +279,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = USE_GPU;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -303,6 +322,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = USE_GPU;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -323,8 +343,9 @@
 					"$(inherited)",
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Starfighter",
 				);
-				HEADER_SEARCH_PATHS = /usr/local/include;
+				HEADER_SEARCH_PATHS = /usr/local/include/SDL2;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -351,8 +372,9 @@
 					"$(inherited)",
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Starfighter",
 				);
-				HEADER_SEARCH_PATHS = /usr/local/include;
+				HEADER_SEARCH_PATHS = /usr/local/include/SDL2;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",

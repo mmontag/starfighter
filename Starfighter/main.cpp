@@ -6,10 +6,31 @@
 //  Copyright © 2016 Patrick Montag. All rights reserved.
 //
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_gamecontroller.h> // game controller api
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL.h>
+
+//#undef USE_GPU
+
+#ifdef USE_GPU
+    #include "SDL_gpu.h"
+    #define RECT GPU_Rect
+    #define MAKERECT(x,y,w,h) {float(x), float(y), float(w), float(h)}
+    #define TEXTURE GPU_Image
+    #define LOADTEXTURE(_, path) GPU_LoadImage(path)
+    #define FREETEXTURE GPU_FreeImage
+    #define RENDERER GPU_Target
+#else
+    #define RECT SDL_Rect
+    #define MAKERECT(x,y,w,h) {int(x), int(y), int(w), int(h)}
+    #define TEXTURE SDL_Texture
+    #define LOADTEXTURE(ren, path) IMG_LoadTexture(ren, path)
+    #define FREETEXTURE SDL_DestroyTexture
+    #define RENDERER SDL_Renderer
+#endif
+
+//#include <SDL_opengl.h>
+//#include <OpenGL/glu.h>
+#include <SDL_image.h>
+#include <SDL_mixer.h>
 #include <iostream>
 #include <string>
 #include <time.h> // time
@@ -40,11 +61,8 @@ bool init();
 //Frees media and shuts down SDL
 void close();
 
-//The window we'll be rendering to
 SDL_Window* window = NULL;
-
-//The window renderer
-SDL_Renderer* renderer = NULL;
+RENDERER* renderer = NULL;
 
 using namespace std;
 
@@ -64,7 +82,7 @@ bool init() {
         }
         
         SDL_GameController *controller = nullptr;
-        
+
         for(int i = 0; i < SDL_NumJoysticks(); i++) {
             if(SDL_IsGameController(i)) {
                 controller = SDL_GameControllerOpen(i);
@@ -89,9 +107,9 @@ bool init() {
             printf("Mix_Init error: %s\n", Mix_GetError());
         }
         // print music decoders available
-        int i,max=Mix_GetNumMusicDecoders();
-        for(i=0; i<max; ++i)
-            printf("Music decoder %d: %s\n", i, Mix_GetMusicDecoder(i));
+//        int i,max=Mix_GetNumMusicDecoders();
+//        for(i=0; i<max; ++i)
+//            printf("Music decoder %d: %s\n", i, Mix_GetMusicDecoder(i));
         Mix_Music *music;
         music = Mix_LoadMUS("lifefrce.mp3");
         Mix_VolumeMusic(MIX_MAX_VOLUME/16);
@@ -105,7 +123,16 @@ bool init() {
         }
 
         //Create window
-        window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+#ifdef USE_GPU
+        printf("Starfighter running with SDL2_gpu renderer.\n");
+        renderer = GPU_Init(SCREEN_WIDTH, SCREEN_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
+        // Crops the renderer down to game size:
+        renderer->w = LOGICAL_WIDTH;
+        renderer->h = LOGICAL_HEIGHT;
+#else
+        printf("Starfighter running with normal SDL2 renderer.\n");
+        window = SDL_CreateWindow("Starfighter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                  SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
         if(window == NULL) {
             printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
             success = false;
@@ -116,16 +143,17 @@ bool init() {
             if( renderer == NULL) {
                 printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError());
                 success = false;
-            }
-            else {
+            } else {
                 SDL_RenderSetLogicalSize(renderer, gameBounds.w, gameBounds.h);
-
-                // initialize PNG loading
-                int imgFlags = IMG_INIT_PNG;
-                if(!(IMG_Init(imgFlags) & imgFlags)) {
-                    printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
-                    success = false;
-                }
+            }
+        }
+#endif
+        if (success) {
+            // initialize PNG loading
+            int imgFlags = IMG_INIT_PNG;
+            if(!(IMG_Init(imgFlags) & imgFlags)) {
+                printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+                success = false;
             }
         }
     }
@@ -134,12 +162,15 @@ bool init() {
 }
 
 void close() {
+#ifdef USE_GPU
+    GPU_Quit();
+#else
     //Destroy window
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     window = NULL;
     renderer = NULL;
-    
+#endif
     //Quit SDL subsystems
     Mix_CloseAudio();
     IMG_Quit();

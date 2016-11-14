@@ -103,7 +103,7 @@ public:
     list<game_obj_ptr> children;
 protected:
     SDL_Rect gameBounds;
-    SDL_Rect clipRect = {0,0,0,0};
+    RECT clipRect = {0,0,0,0};
     Texture* texture;
     list<behaviorFnPtr> behaviors;
     action_ptr actionList;

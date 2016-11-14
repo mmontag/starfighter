@@ -52,9 +52,9 @@ private:
     list<game_obj_ptr>* projectiles;
     
     // Starfighter frames, banking left or right, boosting
-    SDL_Rect starfighterClip;
-    SDL_Rect starfighterLeftClip;
-    SDL_Rect starfighterRightClip;
+    RECT starfighterClip;
+    RECT starfighterLeftClip;
+    RECT starfighterRightClip;
     
     Animation shield;
 

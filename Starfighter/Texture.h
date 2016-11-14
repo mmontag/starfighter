@@ -9,9 +9,27 @@
 #ifndef Texture_h
 #define Texture_h
 
+//#undef USE_GPU
+
+#ifdef USE_GPU
+#include "SDL_gpu.h"
+#define RECT GPU_Rect
+#define MAKERECT(x,y,w,h) {float(x), float(y), float(w), float(h)}
+#define TEXTURE GPU_Image
+#define LOADTEXTURE(_, path) GPU_LoadImage(path)
+#define FREETEXTURE GPU_FreeImage
+#define RENDERER GPU_Target
+#else
+#define RECT SDL_Rect
+#define MAKERECT(x,y,w,h) {int(x), int(y), int(w), int(h)}
+#define TEXTURE SDL_Texture
+#define LOADTEXTURE(ren, path) IMG_LoadTexture(ren, path)
+#define FREETEXTURE SDL_DestroyTexture
+#define RENDERER SDL_Renderer
+#endif
+
+#include <SDL.h>
 #include <string>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 
 #include "Point.h"
 
@@ -20,8 +38,7 @@ class Texture
 {
 public:
     // initializes variables
-    Texture(SDL_Renderer* r);
-    
+    Texture(RENDERER* r);
     // deallocates memory
     ~Texture();
     
@@ -41,9 +58,9 @@ public:
     void setAlpha( Uint8 alpha );
     
     // renders texture at given point
-    void render( Point pos, SDL_Rect* clip = NULL);
-    void render( int x, int y, SDL_Rect* clip = NULL );
-    void render( int x, int y, SDL_Rect* clip, float scale);
+    void render( Point pos, RECT* clip = NULL);
+    void render( int x, int y, RECT* clip = NULL );
+    void render( int x, int y, RECT* clip, float scale);
     
     // gets image dimensions
     int getWidth();
@@ -53,9 +70,9 @@ public:
     
 private:
     // the actual hardware texture
-    SDL_Texture* texture;
-    SDL_Renderer* renderer;
-    
+    TEXTURE* texture;
+    RENDERER* renderer;
+
     // image dimensions
     int width;
     int height;

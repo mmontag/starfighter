@@ -59,7 +59,7 @@ public:
     }
 
 private:
-    SDL_Rect clip;
+    RECT clip;
     bool oneShot = true;
     int frameCounter = 0;
     float frameDivider = DEFAULT_FRAME_DIVIDER;

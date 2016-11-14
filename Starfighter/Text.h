@@ -34,7 +34,7 @@ public:
             int charCode = (int)text[i];
             int col = charCode % 16;
             int row = charCode / 16;
-            SDL_Rect clip = { col * 8, row * 8, 8, 8 };
+            RECT clip = MAKERECT(col * 8, row * 8, 8, 8);
             texture->render(pos.x + origin, pos.y, &clip);
             origin += 8;
             i++;

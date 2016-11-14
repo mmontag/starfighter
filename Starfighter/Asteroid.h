@@ -27,9 +27,9 @@ private:
     static const int ASTEROID_HEIGHT = 16;
     static const int ASTEROID_VEL = 2;
     
-    SDL_Rect asteroidClip =             { ASTEROID_WIDTH * 0, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT };
-    SDL_Rect asteroidDamagedClip =      { ASTEROID_WIDTH * 1, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT };
-    SDL_Rect asteroidDamagedTwiceClip = { ASTEROID_WIDTH * 2, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT };
+    RECT asteroidClip =             { ASTEROID_WIDTH * 0, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT };
+    RECT asteroidDamagedClip =      { ASTEROID_WIDTH * 1, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT };
+    RECT asteroidDamagedTwiceClip = { ASTEROID_WIDTH * 2, 0, ASTEROID_WIDTH, ASTEROID_HEIGHT };
 };
 
 Asteroid::Asteroid(AssetCache* ac, const SDL_Rect& gb) : GameObject(ac, gb) {

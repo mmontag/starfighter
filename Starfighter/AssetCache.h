@@ -13,7 +13,7 @@
 #include <string>
 #include <random>
 #include <iterator>
-#include <SDL2/SDL_mixer.h>
+#include <SDL_mixer.h>
 
 #include "Texture.h"
 using namespace std;
@@ -23,7 +23,7 @@ private:
     map<string, Texture*> textures;
     map<string, Mix_Chunk*> sounds;
     map<string, vector<Mix_Chunk*>*> soundGroups;
-    SDL_Renderer* renderer;
+    RENDERER* renderer;
 
     template<typename Iter, typename RandomGenerator>
     Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
@@ -40,7 +40,7 @@ private:
     }
 
 public:
-    AssetCache(SDL_Renderer* r) : renderer(r) {};
+    AssetCache(RENDERER* r) : renderer(r) {};
 
     void addSoundToGroup(string groupId, string filename) {
         vector<Mix_Chunk*>* list = new vector<Mix_Chunk*>();
