@@ -20,7 +20,9 @@
 #include "Starfield.h"
 #include "Text.h"
 #include "HUD.h"
-#ifndef USE_GPU
+#ifdef USE_GPU
+#include "OpenGLRenderer.h"
+#else
 #include "Map.h"
 #endif
 
@@ -44,7 +46,9 @@ public:
         gameObjectLists = { &projectiles, &destructibles, &sprites, &hostiles };
         starfighter = Starfighter(assetCache, &projectiles, gameBounds);
         starfield = Starfield(renderer, gameBounds);
-#ifndef USE_GPU
+#ifdef USE_GPU
+        openGLRenderer = new OpenGLRenderer(gameBounds);
+#else
         hud = HUD(&starfighter, assetCache, renderer, gameBounds);
         gameMap = new Map(renderer, gameBounds, "test2.tmx");
 #endif
@@ -70,7 +74,9 @@ public:
     list<list<game_obj_ptr>*> gameObjectLists;
     Starfighter starfighter;
     Starfield starfield;
-#ifndef USE_GPU
+#ifdef USE_GPU
+    OpenGLRenderer* openGLRenderer;
+#else
     Map* gameMap;
 #endif
     HUD hud;
@@ -89,72 +95,6 @@ public:
         { SWOOP_DOWN, 12000 },
     };
     list<ScriptEvent>::iterator currentScriptEvent = enemyScript.begin();
-
-//    void setupGLStuff(){
-//        /* Enable smooth shading */
-//        glShadeModel( GL_SMOOTH );
-//
-//        /* Set the background black */
-//        glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
-//
-//        /* Depth buffer setup */
-//        glClearDepth( 1.0f );
-//
-//        /* Enables Depth Testing */
-//        glEnable( GL_DEPTH_TEST );
-//
-//        /* The Type Of Depth Test To Do */
-//        glDepthFunc( GL_LEQUAL );
-//
-//        /* Really Nice Perspective Calculations */
-//        glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
-//
-//        /* Height / width ration */
-//        GLfloat ratio;
-//        ratio = ( GLfloat )gameBounds.w / ( GLfloat )gameBounds.h;
-//
-//        /* Setup our viewport. */
-//        glViewport( 0, 0, ( GLsizei )gameBounds.w, ( GLsizei )gameBounds.h );
-//
-//        /* change to the projection matrix and set our viewing volume. */
-//        glMatrixMode( GL_PROJECTION );
-//        glLoadIdentity( );
-//
-//        /* Set our perspective */
-//        gluPerspective( 45.0f, ratio, 0.1f, 100.0f );
-//
-//        /* Make sure we're chaning the model view and not the projection */
-//        glMatrixMode( GL_MODELVIEW );
-//
-//        /* Reset The View */
-//        glLoadIdentity( );
-//    }
-//
-//    void renderGLStuff() {
-//        /* Set the background black */
-//        glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
-//        /* Clear The Screen And The Depth Buffer */
-//        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-//
-//        /* Move Left 1.5 Units And Into The Screen 6.0 */
-//        glLoadIdentity();
-////        glTranslatef( -1.5f, 0.0f, -6.0f );
-//
-//        glBegin( GL_TRIANGLES );            /* Drawing Using Triangles */
-//        glVertex3f(  0.0f,  0.0f, 0.0f ); /* Top */
-//        glVertex3f( -1.0f, -1.0f, 0.0f ); /* Bottom Left */
-//        glVertex3f(  1.0f, -1.0f, 0.0f ); /* Bottom Right */
-//        glEnd( );                           /* Finished Drawing The Triangle */
-//
-//        /* Move Right 3 Units */
-////        glTranslatef( 3.0f, 0.0f, 0.0f );
-////        glBegin( GL_QUADS );                /* Draw A Quad */
-////        glVertex3f( -1.0f,  1.0f, 0.0f ); /* Top Left */
-////        glVertex3f(  1.0f,  1.0f, 0.0f ); /* Top Right */
-////        glVertex3f(  1.0f, -1.0f, 0.0f ); /* Bottom Right */
-////        glVertex3f( -1.0f, -1.0f, 0.0f ); /* Bottom Left */
-////        glEnd( );                           /* Done Drawing The Quad */
-//    }
 
     void run() {
         // main loop flag
@@ -233,7 +173,10 @@ public:
             starfield.render();
 
            // renderGLStuff();
-#ifndef USE_GPU
+#ifdef USE_GPU
+            openGLRenderer->draw_3d_stuff();
+            //draw_3d_stuff();
+#else
             gameMap->render();
 #endif
 

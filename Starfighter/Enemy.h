@@ -75,7 +75,7 @@ public:
                         action_ptr(new MoveTo(this, 60,  Point(gameBounds.w * 0.25, 50))),
                     }, true),
                     ActionList::serial({
-                        action_ptr(new Delay(0.1)),
+                        action_ptr(new Delay(1)),
                         action_ptr(new LambdaAction(bind(&Enemy::fire, this))),
                     }, true),
                 });

@@ -33,6 +33,12 @@
 		2ECDD8F71DCD918E0048AD7E /* GameObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GameObject.h; sourceTree = "<group>"; };
 		2ED6F34B1DD1A37000DB6773 /* Action.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Action.h; sourceTree = "<group>"; };
 		7C4E5E691DCF2D2D00F0A385 /* Enemy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Enemy.h; sourceTree = "<group>"; };
+		7C4F3A761DDA401D00149499 /* SDL_gpu_OpenGL_1.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SDL_gpu_OpenGL_1.h; sourceTree = "<group>"; };
+		7C4F3A771DDA409400149499 /* glew.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glew.h; sourceTree = "<group>"; };
+		7C4F3A781DDA752B00149499 /* Shader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Shader.h; sourceTree = "<group>"; };
+		7C4F3A791DDA753E00149499 /* OpenGLRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenGLRenderer.h; sourceTree = "<group>"; };
+		7C4F3A7B1DDA76D500149499 /* untextured.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = untextured.frag; path = shaders/untextured.frag; sourceTree = SOURCE_ROOT; };
+		7C4F3A7C1DDA76D500149499 /* untextured.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; name = untextured.vert; path = shaders/untextured.vert; sourceTree = SOURCE_ROOT; };
 		7C7302A91DC6B472008B8BFF /* Animation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Animation.h; sourceTree = "<group>"; };
 		7C7302AC1DC6BC38008B8BFF /* Point.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Point.h; sourceTree = "<group>"; };
 		7C7302B51DC704A2008B8BFF /* Starfield.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Starfield.h; sourceTree = "<group>"; };
@@ -85,6 +91,7 @@
 		2E3A8BD11DB9733C00D0943C /* Starfighter */ = {
 			isa = PBXGroup;
 			children = (
+				7C4F3A7A1DDA76CB00149499 /* Shaders */,
 				7CA2CA201DD92CF900D195F4 /* SDL2_gpu */,
 				7CA2CA081DD5681400D195F4 /* tmx */,
 				7CB95BD71DCC759800797D66 /* libs */,
@@ -110,6 +117,8 @@
 				7CB6DD261DD1DC3600E16A94 /* Texture.cpp */,
 				2EADD9BE1DBB1204002B6BCD /* Timer.h */,
 				2E3A8BD21DB9733C00D0943C /* main.cpp */,
+				7C4F3A781DDA752B00149499 /* Shader.h */,
+				7C4F3A791DDA753E00149499 /* OpenGLRenderer.h */,
 			);
 			path = Starfighter;
 			sourceTree = "<group>";
@@ -120,6 +129,15 @@
 				7CA2CA2B1DD9386C00D195F4 /* OpenGL.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7C4F3A7A1DDA76CB00149499 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				7C4F3A7B1DDA76D500149499 /* untextured.frag */,
+				7C4F3A7C1DDA76D500149499 /* untextured.vert */,
+			);
+			name = Shaders;
 			sourceTree = "<group>";
 		};
 		7CA2CA051DD481B900D195F4 /* actions */ = {
@@ -145,6 +163,8 @@
 			isa = PBXGroup;
 			children = (
 				7CA2CA2A1DD92D2A00D195F4 /* SDL_gpu.h */,
+				7C4F3A761DDA401D00149499 /* SDL_gpu_OpenGL_1.h */,
+				7C4F3A771DDA409400149499 /* glew.h */,
 			);
 			name = SDL2_gpu;
 			sourceTree = "<group>";
@@ -223,7 +243,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp \"${PROJECT_DIR}/Sprites/\"* \"${TARGET_BUILD_DIR}\"\ncp \"${PROJECT_DIR}/Sounds/\"* \"${TARGET_BUILD_DIR}\"";
+			shellScript = "ditto \"${PROJECT_DIR}/Sprites\" \"${TARGET_BUILD_DIR}\"\nditto \"${PROJECT_DIR}/Sounds\" \"${TARGET_BUILD_DIR}\"\nditto \"${PROJECT_DIR}/shaders\" \"${TARGET_BUILD_DIR}/shaders\"";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

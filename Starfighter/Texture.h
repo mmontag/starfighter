@@ -19,6 +19,7 @@
 #define LOADTEXTURE(_, path) GPU_LoadImage(path)
 #define FREETEXTURE GPU_FreeImage
 #define RENDERER GPU_Target
+#define RENDERCOPY(tex,src,ren,dst) GPU_BlitRect(tex, src, ren, dst)
 #else
 #define RECT SDL_Rect
 #define MAKERECT(x,y,w,h) {int(x), int(y), int(w), int(h)}
@@ -26,6 +27,7 @@
 #define LOADTEXTURE(ren, path) IMG_LoadTexture(ren, path)
 #define FREETEXTURE SDL_DestroyTexture
 #define RENDERER SDL_Renderer
+#define RENDERCOPY(tex,src,ren,dst) SDL_RenderCopy(ren, tex, src, dst)
 #endif
 
 #include <SDL.h>

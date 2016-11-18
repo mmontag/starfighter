@@ -11,20 +11,26 @@
 //#undef USE_GPU
 
 #ifdef USE_GPU
-    #include "SDL_gpu.h"
-    #define RECT GPU_Rect
-    #define MAKERECT(x,y,w,h) {float(x), float(y), float(w), float(h)}
-    #define TEXTURE GPU_Image
-    #define LOADTEXTURE(_, path) GPU_LoadImage(path)
-    #define FREETEXTURE GPU_FreeImage
-    #define RENDERER GPU_Target
+
+#include "SDL_gpu.h"
+#include "SDL_gpu_OpenGL_1.h"
+#include "glew.h"
+
+#define RECT GPU_Rect
+#define MAKERECT(x,y,w,h) {float(x), float(y), float(w), float(h)}
+#define TEXTURE GPU_Image
+#define LOADTEXTURE(_, path) GPU_LoadImage(path)
+#define FREETEXTURE GPU_FreeImage
+#define RENDERER GPU_Target
+#define RENDERCOPY(tex,src,ren,dst) GPU_BlitRect(tex, src, ren, dst)
 #else
-    #define RECT SDL_Rect
-    #define MAKERECT(x,y,w,h) {int(x), int(y), int(w), int(h)}
-    #define TEXTURE SDL_Texture
-    #define LOADTEXTURE(ren, path) IMG_LoadTexture(ren, path)
-    #define FREETEXTURE SDL_DestroyTexture
-    #define RENDERER SDL_Renderer
+#define RECT SDL_Rect
+#define MAKERECT(x,y,w,h) {int(x), int(y), int(w), int(h)}
+#define TEXTURE SDL_Texture
+#define LOADTEXTURE(ren, path) IMG_LoadTexture(ren, path)
+#define FREETEXTURE SDL_DestroyTexture
+#define RENDERER SDL_Renderer
+#define RENDERCOPY(tex,src,ren,dst) SDL_RenderCopy(ren, tex, src, dst)
 #endif
 
 //#include <SDL_opengl.h>
@@ -42,12 +48,12 @@
 #include "Game.h"
 
 // logical resolution
-const int LOGICAL_WIDTH = 320;
-const int LOGICAL_HEIGHT = 280;
+const int LOGICAL_WIDTH = 400;
+const int LOGICAL_HEIGHT = 300;
 const SDL_Rect gameBounds = { 0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT };
 
 // window scale factor
-const int SCREEN_SCALE_FACTOR = 3;
+const int SCREEN_SCALE_FACTOR = 2;
 
 // screen dimension constants
 const int SCREEN_WIDTH = (gameBounds.w * SCREEN_SCALE_FACTOR);
@@ -63,6 +69,7 @@ void close();
 
 SDL_Window* window = NULL;
 RENDERER* renderer = NULL;
+//GPU_Target* frameBuffer = NULL;
 
 using namespace std;
 
@@ -125,10 +132,21 @@ bool init() {
         //Create window
 #ifdef USE_GPU
         printf("Starfighter running with SDL2_gpu renderer.\n");
-        renderer = GPU_Init(SCREEN_WIDTH, SCREEN_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
+
+        GPU_SetDebugLevel(GPU_DEBUG_LEVEL_MAX);
+        GPU_SetRequiredFeatures(GPU_FEATURE_BASIC_SHADERS);
+
+//        GPU_Image* image = GPU_CreateImage(LOGICAL_WIDTH, LOGICAL_HEIGHT, GPU_FORMAT_RGB);
+//        renderer = GPU_LoadTarget(image);
+//        frameBuffer = GPU_InitRenderer(GPU_RENDERER_OPENGL_3, LOGICAL_WIDTH, LOGICAL_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
+
+        renderer = GPU_InitRenderer(GPU_RENDERER_OPENGL_3, LOGICAL_WIDTH, LOGICAL_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
+        GPU_SetWindowResolution(SCREEN_WIDTH, SCREEN_HEIGHT);
+        GPU_SetVirtualResolution(renderer, LOGICAL_WIDTH, LOGICAL_HEIGHT);
+
         // Crops the renderer down to game size:
-        renderer->w = LOGICAL_WIDTH;
-        renderer->h = LOGICAL_HEIGHT;
+//        renderer->w = LOGICAL_WIDTH;
+//        renderer->h = LOGICAL_HEIGHT;
 #else
         printf("Starfighter running with normal SDL2 renderer.\n");
         window = SDL_CreateWindow("Starfighter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,

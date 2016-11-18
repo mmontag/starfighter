@@ -123,11 +123,7 @@ void Texture::render( int x, int y, RECT* clip )
     }
 
     //Render to screen
-#ifdef USE_GPU
-    GPU_BlitRect(texture, clip, renderer, &renderQuad);
-#else
-    SDL_RenderCopy( renderer, texture, clip, &renderQuad );
-#endif
+    RENDERCOPY(texture, clip, renderer, &renderQuad);
 }
 
 void Texture::render(int x, int y, RECT* clip, float scale) {
@@ -142,11 +138,7 @@ void Texture::render(int x, int y, RECT* clip, float scale) {
     }
 
     //Render to screen
-#ifdef USE_GPU
-    GPU_BlitRect(texture, clip, renderer, &renderQuad);
-#else
-    SDL_RenderCopy( renderer, texture, clip, &renderQuad );
-#endif
+    RENDERCOPY(texture, clip, renderer, &renderQuad);
 }
 
 int Texture::getWidth()

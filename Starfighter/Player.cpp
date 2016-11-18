@@ -39,7 +39,7 @@ Starfighter::Starfighter(AssetCache* ac, list<game_obj_ptr>* p, SDL_Rect &gb) : 
     laserEnergy = 0;
     maxLaserEnergy = 5;
     laserCooldownRate = BASE_COOLDOWN_RATE; // fractions of energy per frame
-    health = 5;
+    health = 15;
     damageInflicted = 1;
 }
 
