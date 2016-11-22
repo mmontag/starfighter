@@ -21,6 +21,7 @@
 #include "Text.h"
 #include "HUD.h"
 #ifdef USE_GPU
+//#include "OpenGLFixedFunctionRenderer.h"
 #include "OpenGLRenderer.h"
 #else
 #include "Map.h"
@@ -175,7 +176,7 @@ public:
            // renderGLStuff();
 #ifdef USE_GPU
             openGLRenderer->draw_3d_stuff();
-            //draw_3d_stuff();
+            //openGLRenderer->renderAllObjects(
 #else
             gameMap->render();
 #endif
