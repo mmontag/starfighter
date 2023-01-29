@@ -27,7 +27,7 @@ private:
 
     template<typename Iter, typename RandomGenerator>
     Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
-        uniform_int_distribution<> dis(0, distance(start, end) - 1);
+        uniform_int_distribution<> dis(0, (int)(distance(start, end) - 1));
         advance(start, dis(g));
         return start;
     }

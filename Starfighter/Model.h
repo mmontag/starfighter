@@ -144,29 +144,11 @@ public:
         glEnableVertexAttribArray(normal_loc);
         glEnableVertexAttribArray(color_loc);
 
-        glVertexAttribPointer(vertex_loc,
-                              3,                           // size
-                              GL_FLOAT,                    // type
-                              GL_FALSE,                    // normalize
-                              stride,                      // stride
-                              (void*)(sizeof(glm::vec3)*0) // offset
-                              );
-
-        glVertexAttribPointer(normal_loc,
-                              3,
-                              GL_FLOAT,
-                              GL_FALSE,
-                              stride,
-                              (void*)(sizeof(glm::vec3)*1)
-                              );
-
-        glVertexAttribPointer(color_loc,
-                              3,
-                              GL_FLOAT,
-                              GL_FALSE,
-                              stride,
-                              (void*)(sizeof(glm::vec3)*2)
-                              );
+        static long vec3size = sizeof(glm::vec3);
+        //                     handle    size  type   normalize  stride         offset
+        glVertexAttribPointer(vertex_loc, 3, GL_FLOAT, GL_FALSE, stride, (void*)(vec3size*0));
+        glVertexAttribPointer(normal_loc, 3, GL_FLOAT, GL_FALSE, stride, (void*)(vec3size*1));
+        glVertexAttribPointer(color_loc,  3, GL_FLOAT, GL_FALSE, stride, (void*)(vec3size*2));
 
         glDrawArrays(GL_TRIANGLES, 0, 3 * (int)triangles.size());
 

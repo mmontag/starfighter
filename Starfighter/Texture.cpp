@@ -36,7 +36,7 @@ bool Texture::loadFromFile( std::string path )
     //Load image at specified path
 #ifdef USE_GPU
     texture = GPU_LoadImage(path.c_str());
-    GPU_SetImageFilter(texture, GPU_FILTER_NEAREST); // Nice & crispy pixels 😉
+    GPU_SetImageFilter(texture, GPU_FILTER_NEAREST); // Nice & crispy pixels :)
     width = texture->w;
     height = texture->h;
 #else

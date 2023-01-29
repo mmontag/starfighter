@@ -24,7 +24,7 @@
  <tileset firstgid="33" name="mech-tiles" tilewidth="16" tileheight="16" tilecount="240" columns="20">
   <image source="mech-tiles.png" width="320" height="192"/>
  </tileset>
- <layer name="blah" width="10" height="50">
+ <layer name="blah" width="10" height="50" offsetx="0" offsety="1">
   <data encoding="csv">
 10,12,13,13,13,13,13,13,14,10,
 10,11,13,13,13,13,13,13,14,10,

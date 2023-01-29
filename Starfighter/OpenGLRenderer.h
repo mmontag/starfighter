@@ -38,12 +38,21 @@ public:
     GLuint screenShaderProgram;
     GLuint frameBuffer;
     GLuint texColorBuffer;
+    GLuint rboDepthStencil;
     GLint screenViewport[4];
     SDL_Rect gameBounds;
 
     Model* model;
 
     OpenGLRenderer(const SDL_Rect& gameBounds) {
+
+
+
+        // Dummy model for testing
+        model = new Model("models/starfighter.obj");
+
+
+
         this->gameBounds = gameBounds;
         glGetIntegerv(GL_VIEWPORT, screenViewport);
 
@@ -94,7 +103,7 @@ public:
         glGenFramebuffers(1, &frameBuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
-        // Create texture to hold color buffer. No Renderbuffer object for depth/stencil buffer is necessary.
+        // Create texture to hold color buffer
         glGenTextures(1, &texColorBuffer);
         glBindTexture(GL_TEXTURE_2D, texColorBuffer);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, gameBounds.w, gameBounds.h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -102,7 +111,11 @@ public:
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
 
-        model = new Model("models/cube.obj");
+        // Create Renderbuffer Object to hold depth and stencil buffers. Needed for GL_DEPTH_TEST :)
+        glGenRenderbuffers(1, &rboDepthStencil);
+        glBindRenderbuffer(GL_RENDERBUFFER, rboDepthStencil);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, gameBounds.w, gameBounds.h);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rboDepthStencil);
     }
 
     GLuint GPU_LoadVertexShader(const char* filename) {
@@ -163,76 +176,8 @@ public:
 
         // Model transform - should come from GameObject
         glm::mat4 modelMat = glm::mat4(1.0f);
-        modelMat = glm::rotate(modelMat, float(glm::radians(50.0 * t)), glm::vec3(0, 1, 0));
-        modelMat = glm::rotate(modelMat, float(glm::radians(50.0 * t)), glm::vec3(1, 0, 0));
-
-//        // Mesh creation
-//        int stride = 10;
-//        const int numTriangles = 4;
-//        GLfloat gldata[stride * numTriangles * 3];
-//
-//        struct Triangle {
-//            glm::vec3 verts[3];
-//            glm::vec4 color;
-//            glm::vec3 normal;
-//        };
-//
-//        Triangle triangles[numTriangles] = {
-//            {
-//                glm::vec3{ 1, 1, 1},
-//                glm::vec3{ 1,-1,-1},
-//                glm::vec3{-1, 1,-1},
-//                glm::vec4{0.5, 0.5, 0.5, 1.0},
-//            },
-//            {
-//                glm::vec3{ 1,-1,-1},
-//                glm::vec3{-1,-1, 1},
-//                glm::vec3{-1, 1,-1},
-//                glm::vec4{0.5, 0.5, 0.5, 1.0},
-//            },
-//            {
-//                glm::vec3{ 1, 1, 1},
-//                glm::vec3{-1, 1,-1},
-//                glm::vec3{-1,-1, 1},
-//                glm::vec4{0.5, 0.5, 0.5, 1.0},
-//            },
-//            {
-//                glm::vec3{ 1, 1, 1},
-//                glm::vec3{-1,-1, 1},
-//                glm::vec3{ 1,-1,-1},
-//                glm::vec4{0.5, 0.5, 0.5, 1.0},
-//            },
-//        };
-//        for (int tr = 0; tr < numTriangles; tr++) {
-//            Triangle tri = triangles[tr];
-//
-//            // Normals
-//            for (int i = 0; i < 3; i++) {
-//                glm::vec3 edge1 = tri.verts[2] - tri.verts[0];
-//                glm::vec3 edge2 = tri.verts[1] - tri.verts[0];
-//                tri.normal = glm::normalize(glm::cross(edge2, edge1));
-//            }
-//
-//            for (int i = 0; i < 3; i++) {
-//                // Vertex
-//                int offset = 0;
-//                int vertIdx = tr * 3 + i;
-//                gldata[vertIdx * stride + offset + 0] = tri.verts[i][0];
-//                gldata[vertIdx * stride + offset + 1] = tri.verts[i][1];
-//                gldata[vertIdx * stride + offset + 2] = tri.verts[i][2];
-//                // Normals
-//                offset += 3;
-//                gldata[vertIdx * stride + offset + 0] = tri.normal[0];
-//                gldata[vertIdx * stride + offset + 1] = tri.normal[1];
-//                gldata[vertIdx * stride + offset + 2] = tri.normal[2];
-//                // Colors
-//                offset += 3;
-//                gldata[vertIdx * stride + offset + 0] = tri.color[0];
-//                gldata[vertIdx * stride + offset + 1] = tri.color[1];
-//                gldata[vertIdx * stride + offset + 2] = tri.color[2];
-//                gldata[vertIdx * stride + offset + 3] = tri.color[3];
-//            }
-//        }
+        modelMat = glm::rotate(modelMat, float(glm::radians(90.0)), glm::vec3(1, 0, 0));
+        modelMat = glm::rotate(modelMat, float(glm::radians(50.0 * t)), glm::vec3(0, 0, 1));
 
         glUseProgram(p);
         // Update model/view/projection uniform matrices
@@ -242,45 +187,6 @@ public:
         glUniformMatrix4fv(modelViewProjection_loc, 1, 0, mvp_ptr);
 
         this->model->render(vertex_loc, normal_loc, color_loc);
-
-//        glBindVertexArray(VAO);
-//
-//        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-//        glBufferData(GL_ARRAY_BUFFER, sizeof(gldata), gldata, GL_STREAM_DRAW);
-//
-//        glEnableVertexAttribArray(vertex_loc);
-//        glEnableVertexAttribArray(normal_loc);
-//        glEnableVertexAttribArray(color_loc);
-//
-//        glVertexAttribPointer(vertex_loc,
-//                              3,                    // size
-//                              GL_FLOAT,             // type
-//                              GL_FALSE,             // normalize
-//                              sizeof(float)*stride, // stride
-//                              (void*)0              // offset
-//                              );
-//
-//        glVertexAttribPointer(normal_loc,
-//                              3,                        // size
-//                              GL_FLOAT,                 // type
-//                              GL_FALSE,                 // normalize
-//                              sizeof(float)*stride,     // stride
-//                              (void*)(sizeof(float)*3)  // offset
-//                              );
-//
-//        glVertexAttribPointer(color_loc,
-//                              4,                        // size
-//                              GL_FLOAT,                 // type
-//                              GL_FALSE,                 // normalize
-//                              sizeof(float)*stride,     // stride
-//                              (void*)(sizeof(float)*6)  // offset
-//                              );
-//
-//        glDrawArrays(GL_TRIANGLES, 0, 3 * numTriangles);
-//
-//        glDisableVertexAttribArray(color_loc);
-//        glDisableVertexAttribArray(normal_loc);
-//        glDisableVertexAttribArray(vertex_loc);
 
         end_3d();
     }

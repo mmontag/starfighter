@@ -9,8 +9,8 @@
 #ifndef HUD_h
 #define HUD_h
 
-#import "AssetCache.h"
-#import "Point.h"
+#include "AssetCache.h"
+#include "Point.h"
 
 // where is this used?
 const Point POWER_METER_POS(5, 10);

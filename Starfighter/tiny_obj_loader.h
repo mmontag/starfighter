@@ -1335,10 +1335,17 @@ bool LoadObj(attrib_t *attrib, std::vector<shape_t> *shapes,
     return false;
   }
 
+  std::string file = std::string(filename);
   std::string baseDir;
   if (mtl_basedir) {
     baseDir = mtl_basedir;
+  } else {
+      size_t pos = file.find_last_of("/\\");
+      if (pos != std::string::npos) {
+        baseDir = file.substr(0, pos + 1);
+      }
   }
+
   MaterialFileReader matFileReader(baseDir);
 
   return LoadObj(attrib, shapes, materials, err, &ifs, &matFileReader,
