@@ -9,6 +9,7 @@
 #include <SDL.h>
 
 //#undef USE_GPU
+#define USE_TMX
 
 #ifdef USE_GPU
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -50,12 +51,16 @@
 //#include "OpenGLFixedFunctionRenderer.h"
 
 // logical resolution
-const int LOGICAL_WIDTH = 400;
-const int LOGICAL_HEIGHT = 300;
+const int LOGICAL_WIDTH = 320;
+const int LOGICAL_HEIGHT = 320;
 const SDL_Rect gameBounds = { 0, 0, LOGICAL_WIDTH, LOGICAL_HEIGHT };
 
 // window scale factor
+#ifdef __EMSCRIPTEN__
+const int SCREEN_SCALE_FACTOR = 1;
+#else
 const int SCREEN_SCALE_FACTOR = 3;
+#endif
 
 // screen dimension constants
 const int SCREEN_WIDTH = (gameBounds.w * SCREEN_SCALE_FACTOR);
@@ -79,7 +84,8 @@ bool init() {
     bool success = true;
     
     //Initialize SDL
-    if( SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+    if (SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0) {
+//    if( SDL_Init(SDL_INIT_EVERYTHING & ~(SDL_INIT_TIMER | SDL_INIT_HAPTIC)) < 0) {
         printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
         success = false;
     }
@@ -109,18 +115,18 @@ bool init() {
         Mix_AllocateChannels(32);
 
         // load support for the MOD sample/music formats
-        int flags = MIX_INIT_MODPLUG | MIX_INIT_MP3;
+        int flags = MIX_INIT_MOD | MIX_INIT_MP3;
         int inited = Mix_Init(flags);
         if((inited & flags) != flags) {
             printf("Mix_Init error: %s\n", Mix_GetError());
         }
         // print music decoders available
-//        int i,max=Mix_GetNumMusicDecoders();
-//        for(i=0; i<max; ++i)
-//            printf("Music decoder %d: %s\n", i, Mix_GetMusicDecoder(i));
+        int i,max=Mix_GetNumMusicDecoders();
+        for(i=0; i<max; ++i)
+            printf("Music decoder %d: %s\n", i, Mix_GetMusicDecoder(i));
         Mix_Music *music;
-        music = Mix_LoadMUS("lifefrce.mp3");
-        Mix_VolumeMusic(MIX_MAX_VOLUME/16);
+        music = Mix_LoadMUS("spacedeb.mod");
+        Mix_VolumeMusic(MIX_MAX_VOLUME/4);
         if(!music) {
             printf("Mix_LoadMUS error: %s\n", Mix_GetError());
         } else {
@@ -150,7 +156,11 @@ bool init() {
         }
         else {
             // Create vsynced renderer for window
+            #ifdef __EMSCRIPTEN__
+            renderer = SDL_CreateRenderer(window, -1, 0);
+            #else
             renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
+            #endif
             if( renderer == NULL) {
                 printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError());
                 success = false;

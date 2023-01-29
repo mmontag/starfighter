@@ -23,8 +23,12 @@
 #ifdef USE_GPU
 //#include "OpenGLFixedFunctionRenderer.h"
 #include "OpenGLRenderer.h"
-#else
+#endif
+#ifdef USE_TMX
 #include "Map.h"
+#endif
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
 #endif
 
 struct ScriptEvent {
@@ -38,10 +42,16 @@ int GameObject::instanceCount;
 
 class Game {
 public:
-    Game(RENDERER* r, const SDL_Rect& gb) {
-        renderer = r;
-        gameBounds = gb;
-        assetCache = new AssetCache(renderer);
+    Game(RENDERER* r, const SDL_Rect& gb) :
+        renderer(r),
+        gameBounds(gb),
+        assetCache(new AssetCache(renderer)),
+        scoreText(Point(5, 5), assetCache, scoreTextBuf),
+        debugText(Point(5, gameBounds.h - 13), assetCache, debugTextBuf)
+     {
+//        renderer = r;
+//        gameBounds = gb;
+//        assetCache = new AssetCache(renderer);
         preloadAssets();
 
         gameObjectLists = { &projectiles, &destructibles, &sprites, &hostiles };
@@ -51,6 +61,8 @@ public:
         openGLRenderer = new OpenGLRenderer(gameBounds);
 #else
         hud = HUD(&starfighter, assetCache, renderer, gameBounds);
+#endif
+#ifdef USE_TMX
         gameMap = new Map(renderer, gameBounds, "test2.tmx");
 #endif
         GameObjectFactory::assetCache = assetCache;
@@ -60,6 +72,8 @@ public:
         GameObjectFactory::destructibles = &destructibles;
         GameObjectFactory::starfighter = &starfighter;
         GameObjectFactory::gameBounds = gb;
+
+
     }
 
     RENDERER* renderer;
@@ -75,9 +89,14 @@ public:
     list<list<game_obj_ptr>*> gameObjectLists;
     Starfighter starfighter;
     Starfield starfield;
+    bool showDebug;
+    bool pauseGame;
+    Text scoreText;
+    Text debugText;
 #ifdef USE_GPU
     OpenGLRenderer* openGLRenderer;
-#else
+#endif
+#ifdef USE_TMX
     Map* gameMap;
 #endif
     HUD hud;
@@ -97,28 +116,18 @@ public:
     };
     list<ScriptEvent>::iterator currentScriptEvent = enemyScript.begin();
 
-    void run() {
-        // main loop flag
-        bool quit = false;
-        gameStartTime = SDL_GetTicks();
 
-        // event handler
-        SDL_Event e;
-
-        // object lists
-        Text scoreText(Point(5, 5), assetCache, scoreTextBuf);
-        Text debugText(Point(5, gameBounds.h - 13), assetCache, debugTextBuf);
-
-        // OpenGL
-      //  setupGLStuff();
-
-        while(!quit) {
-
+    bool handleEvents() {
             // ------- HANDLE
+            // main loop flag
+//            bool quit = false;
+            // event handler
+            SDL_Event e;
 
             while(SDL_PollEvent(&e) != 0) {
                 if(e.type == SDL_QUIT) {
-                    quit = true;
+//                    quit = true;
+                  return false;
                 }
 
                 starfighter.handleEvent( e );
@@ -130,6 +139,13 @@ public:
                             break;
                         case SDLK_e:
                             GameObjectFactory::create("enemy");
+                            break;
+                        case SDLK_d:
+                            showDebug = !showDebug;
+                            break;
+                        case SDLK_p:
+                            pauseGame = !pauseGame;
+                            break;
                     }
                 }
 
@@ -145,7 +161,7 @@ public:
 
             // Execute game script
             while (currentScriptEvent != enemyScript.end() &&
-                   SDL_GetTicks() - gameStartTime > currentScriptEvent->time) {
+                   SDL_GetTicks() > currentScriptEvent->time) {
                 destructibles.push_front(game_obj_ptr(new Enemy(assetCache, gameBounds, &starfighter,
                                                                 currentScriptEvent->behavior)));
                 currentScriptEvent++;
@@ -171,45 +187,67 @@ public:
 
             // ------- RENDER
 
+#ifdef USE_GPU
+            GPU_Clear(renderer);
+#else
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+            SDL_RenderClear(renderer);
+#endif
+
             starfield.render();
 
-           // renderGLStuff();
 #ifdef USE_GPU
             openGLRenderer->draw_3d_stuff();
-            //openGLRenderer->renderAllObjects(
-#else
+            // renderGLStuff();
+            // openGLRenderer->renderAllObjects();
+#endif
+#ifdef USE_TMX
             gameMap->render();
 #endif
 
             renderAllObjects(gameObjectLists);
             starfighter.render();
 
-#ifndef USE_GPU
+#ifdef USE_TMX
             gameMap->renderAbove();
 #endif
             sprintf(scoreTextBuf, "Score: %d", points);
             scoreText.render();
 
-            sprintf(debugTextBuf, "go: %d / d: %lu / p: %lu / t: %d / a: %d",
-                    GameObject::instanceCount, destructibles.size(), projectiles.size(), Texture::instanceCount, Action::instanceCount);
-            debugText.render();
+            if (showDebug) {
+              sprintf(debugTextBuf, "go: %d / d: %lu / p: %lu / t: %d / a: %d",
+                      GameObject::instanceCount, destructibles.size(), projectiles.size(), Texture::instanceCount, Action::instanceCount);
+              debugText.render();
+            }
 #ifndef USE_GPU
             hud.render();
 #endif
 
 #ifdef USE_GPU
             GPU_Flip(renderer);
-            GPU_Clear(renderer);
 #else
             SDL_RenderPresent(renderer);
-            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-            SDL_RenderClear(renderer);
 #endif
-        }
+            return true;
+    }
+
+    void run() {
+        // object lists
+
+        // OpenGL
+      //  setupGLStuff();
+      gameStartTime = SDL_GetTicks();
+      #ifdef __EMSCRIPTEN__
+//        emscripten_set_main_loop([]() { handleEvents(); }, 0, true);
+        emscripten_set_main_loop_arg([](void* arg){static_cast<Game*>(arg)->handleEvents();}, this, 0, -1);
+      #else
+        while (handleEvents())
+          ;
+      #endif
     }
 
     void reset() {
-#ifndef USE_GPU
+#ifdef USE_TMX
         gameMap->resetPosition();
 #endif
         gameStartTime = SDL_GetTicks();
