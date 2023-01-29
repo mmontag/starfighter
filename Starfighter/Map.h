@@ -39,6 +39,7 @@ public:
     Map(RENDERER* renderer, SDL_Rect gb, char const* filename) {
         ren = renderer;
         gameBounds = gb;
+        printf("Game bounds: %d x %d\n", gb.w, gb.h);
         tmx_img_load_func = (void* (*)(const char*))sdl_img_loader;
         tmx_img_free_func = (void  (*)(void*))      SDL_DestroyTexture;
 
@@ -53,6 +54,8 @@ public:
         map_rect.w = gameMap->width  * gameMap->tile_width;
         map_rect.h = gameMap->height * gameMap->tile_height;
         map_rect.x = 0;  map_rect.y = 0;
+
+        printf("Map bounds: %d x %d\n", map_rect.w, map_rect.h);
 
         mapLayers = render_map(gameMap);
 
@@ -76,33 +79,27 @@ public:
     void getCollidingLayers() {
         tmx_layer* layer = gameMap->ly_head;
         while (layer) {
-            tmx_property* prop = layer->properties;
-            while (prop) {
-                if (strcmp(prop->name, "collides") == 0 && strcmp(prop->value, "true") == 0) {
-                    collidingLayers.push_back(layer);
-                }
-                prop = prop->next;
+            tmx_property* prop = tmx_get_property(layer->properties, "collides");
+            if (prop && prop->type == PT_BOOL && prop->value.boolean == true) {
+                collidingLayers.push_back(layer);
             }
             layer = layer->next;
         }
     }
 
     float getParallax(tmx_layer* layer) {
-        tmx_property* prop = layer->properties;
-        while (prop) {
-            if (strcmp(prop->name, "parallax") == 0) {
-                return strtof(prop->value, NULL);
-            }
-            prop = prop->next;
+        tmx_property* prop = tmx_get_property(layer->properties, "parallax");
+        if (prop && prop->type == PT_FLOAT) {
+          return prop->value.decimal;
         }
         return 1.0;
     }
 
     void saveSurfaces() {
-        tmx_tileset* tileset = gameMap->ts_head;
+        tmx_tileset_list* tileset = gameMap->ts_head;
         while(tileset) {
-            SDL_Surface* surface = IMG_Load(tileset->image->source);
-            tileSurfaceMap[tileset->image] = surface;
+            SDL_Surface* surface = IMG_Load(tileset->tileset->image->source);
+            tileSurfaceMap[tileset->tileset->image] = surface;
             tileset = tileset->next;
         }
     }
@@ -280,6 +277,10 @@ list<MapLayer> Map::render_map(tmx_map *map) {
     h = map->height * map->tile_height;
     list<MapLayer> mapLayers;
 
+    if (!layer) {
+      printf("Oops, map layer (map->ly_head) is empty. Nothing to do in render_map.\n");
+    }
+
     while (layer) {
         if (layer->visible) {
             if (!(texture = SDL_CreateTexture(ren, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, w, h)))
@@ -291,13 +292,15 @@ list<MapLayer> Map::render_map(tmx_map *map) {
             mapLayers.push_back(MapLayer{texture, getParallax(layer)});
             
             if (layer->type == L_OBJGR) {
-                printf("TODO: TMX object layers currently unsupported.");
+                printf("Skipping %s; TMX object layers currently unsupported.\n", layer->name);
                 //draw_objects(layers->content.objgr);
             } else if (layer->type == L_IMAGE) {
                 draw_image_layer(layer->content.image);
             } else if (layer->type == L_LAYER) {
-                printf("Drawing layer %s\n", layer->name);
+                printf("Drawing %s\n", layer->name);
                 draw_layer(map, layer);
+            } else {
+                printf("Unknown layer type %d\n", layer->type);
             }
         }
         layer = layer->next;
