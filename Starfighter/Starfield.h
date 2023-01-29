@@ -11,6 +11,9 @@
 
 #include "Point.h"
 
+static const float MAX_STAR_SPEED = 0.5;
+static const float MIN_STAR_SPEED = 0.1;
+
 inline float RANDF() {
     return (float) rand() / RAND_MAX;
 }
@@ -52,17 +55,19 @@ public:
             stars.push_back(new Star(rand() % gameBounds.w,
                                      rand() % gameBounds.h,
                                      0,
-                                     RANDF(0.5, 1.5)));
+                                     RANDF(MIN_STAR_SPEED, MAX_STAR_SPEED)));
         }
     }
 
     void render() {
+//      return; // disable for Emscripten testing
 //        SDL_SetRenderTarget(renderer, texture);
+//        SDL_RenderClear(renderer);
 //        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 100);
 #ifdef USE_GPU
         GPU_SetShapeBlendMode(GPU_BLEND_NORMAL);
 #else
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+//        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 #endif
         // -- This does a motion-trail effect:
         // static const SDL_Rect rect = { 0, 0, width, height };
@@ -76,7 +81,7 @@ public:
             star->pos.y += speed;
             if (star->pos.y > gameBounds.h) star->pos.y -= gameBounds.h;
 #ifdef USE_GPU
-            GPU_Line(renderer, star->pos.x, star->pos.y, star->pos.x, star->pos.y - speed, *col);
+            GPU_Line(renderer, star->pos.x, star->pos.y, star->pos.x, star->pos.y - fmax(1.0, speed * 20), *col);
 #else
             SDL_SetRenderDrawColor(renderer, col->r, col->g, col->b, col->a);
             SDL_RenderDrawLine(renderer, star->pos.x, star->pos.y, star->pos.x, star->pos.y - speed);
@@ -90,7 +95,7 @@ private:
     RENDERER* renderer;
     TEXTURE* texture;
     SDL_Rect gameBounds;
-    int count = 200;
+    int count = 80;
     vector<Star*> stars;
 };
 
